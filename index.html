@@ -98,7 +98,6 @@
         textarea { height: 80px; resize: none; margin-top: 8px; }
         #summary { font-size:0.8rem; text-align:left; background:rgba(0,0,0,0.05); padding:12px; border-radius:10px; overflow-y:auto; flex:1; margin-bottom:5px; line-height:1.5; }
 
-        /* ボタンが決定された時のスタイル */
         .btn-main.success { background: var(--accent-green) !important; box-shadow: 0 4px 0 #4a7a66 !important; }
     </style>
 </head>
@@ -171,11 +170,7 @@
         let val = document.getElementById(`q${n}_free`)?.value || options[n][slotState[n]];
         if (n === 4) {
             const now = new Date();
-            const year = now.getFullYear();
-            const month = now.getMonth() + 1;
-            const date = now.getDate();
-            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-            val = `${val}(現時刻:${year}/${month}/${date} ${timeStr})`;
+            val = `${val}(現時刻:${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')})`;
         }
         data[`q${n}`] = val; 
         setTimeout(next, 120); 
@@ -223,16 +218,26 @@
         const btn = document.getElementById('gps-btn');
         btn.innerText = "取得中...";
         navigator.geolocation.getCurrentPosition(
-            (pos) => {
+            async (pos) => {
                 const lat = pos.coords.latitude;
                 const lng = pos.coords.longitude;
-                const val = `現在地 (参照: https://www.google.com/maps?q=${lat},${lng})`;
-                data[`q${n}`] = val;
-                btn.innerText = "取得完了！";
-                setTimeout(next, 500);
+                try {
+                    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, {
+                        headers: { 'Accept-Language': 'ja' }
+                    });
+                    const resData = await response.json();
+                    const addr = resData.display_name || "住所が特定できませんでした";
+                    data[`q${n}`] = addr;
+                    btn.innerText = "取得完了！";
+                    setTimeout(next, 500);
+                } catch (e) {
+                    data[`q${n}`] = `現在地 (${lat}, ${lng})`;
+                    btn.innerText = "座標で取得";
+                    setTimeout(next, 500);
+                }
             },
             () => {
-                alert("位置情報が取得できませんでした。許可されているか確認してください。");
+                alert("位置情報が取得できませんでした。");
                 btn.innerText = "現在地を取得";
             },
             { enableHighAccuracy: true }
@@ -247,17 +252,11 @@
     async function finish() { 
         const btn = document.getElementById('btn-finish');
         const text = `【注文票】\n■構成：${data.q1}\n■目的：${data.q2.join('・')}\n■場所：${data.q3}\n■時間：${data.q4}\n■予算：${data.q5}\n■移動：${data.q6}\n■テーマ：${data.q7}\n■こだわり：${data.q8}\n■NG：${data.q9}`; 
-        
-        // ボタンを緑色にする
         btn.classList.add('success');
         btn.innerText = "コピー完了！";
-
         try { 
             await navigator.clipboard.writeText(text); 
-            // 少しだけ色が変わったのを見せてから遷移
-            setTimeout(() => {
-                window.location.href = "https://gemini.google.com/"; 
-            }, 600);
+            setTimeout(() => { window.location.href = "https://gemini.google.com/"; }, 600);
         } catch (err) { 
             window.location.href = "https://gemini.google.com/"; 
         } 
