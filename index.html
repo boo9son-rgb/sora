@@ -184,7 +184,7 @@
     
     function nextMulti() { 
         const free = document.getElementById('q2_free').value; 
-        data.q2 = [...q2_selected_chips]; 
+        data.q2 = [...q2_selected_chips];
         if(free) data.q2.push(free); 
         if(!data.q2.length) return alert("なにか選んでね！"); 
         setTimeout(next, 120); 
@@ -226,26 +226,12 @@
                         headers: { 'Accept-Language': 'ja' }
                     });
                     const resData = await response.json();
-                    
-                    let addr = "";
-                    if (resData.address) {
-                        const a = resData.address;
-                        const post = a.postcode ? `〒${a.postcode} ` : "";
-                        const pref = a.province || a.prefecture || "";
-                        const city = a.city || a.town || a.village || "";
-                        const sub = a.suburb || "";
-                        const road = a.road || "";
-                        const house = a.house_number || "";
-                        addr = post + pref + city + sub + road + house;
-                    }
-                    
-                    if (!addr) addr = resData.display_name.replace(/, 日本$/, "").replace(/^\d{3}-\d{4},? ?/, "");
-                    
-                    data[`q${n}`] = addr || `現在地 (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+                    const addr = resData.display_name || "住所が特定できませんでした";
+                    data[`q${n}`] = addr;
                     btn.innerText = "取得完了！";
                     setTimeout(next, 500);
                 } catch (e) {
-                    data[`q${n}`] = `現在地 (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+                    data[`q${n}`] = `現在地 (${lat}, ${lng})`;
                     btn.innerText = "座標で取得";
                     setTimeout(next, 500);
                 }
