@@ -63,6 +63,8 @@
             border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
             touch-action: none !important; 
         }
+        /* 選択中のドットを強調 */
+        .dot.active-preset { border-color: var(--accent-orange); box-shadow: 0 0 8px var(--accent-orange); }
 
         .custom-color-wapper { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; font-size: 0.8rem; }
         #color-picker { border: none; width: 30px; height: 30px; cursor: pointer; background: none; }
@@ -138,15 +140,18 @@
     <div class="bg-panel" id="bg-panel">
         <div class="color-dots">
             <div class="dot" style="background-color: #a3c1da;" onpointerup="applyBG('default')"></div>
-            <div id="p1" class="dot" onpointerdown="startLongPress(event, 'p1')" onpointerup="endLongPress('p1')" onpointerleave="endLongPress('p1')"></div>
-            <div id="p2" class="dot" onpointerdown="startLongPress(event, 'p2')" onpointerup="endLongPress('p2')" onpointerleave="endLongPress('p2')"></div>
-            <div id="p3" class="dot" onpointerdown="startLongPress(event, 'p3')" onpointerup="endLongPress(event, 'p3')" onpointerleave="endLongPress('p3')"></div>
+            <div id="p1" class="dot" onpointerup="selectPreset('p1')"></div>
+            <div id="p2" class="dot" onpointerup="selectPreset('p2')"></div>
+            <div id="p3" class="dot" onpointerup="selectPreset('p3')"></div>
         </div>
         <div class="custom-color-wapper">
             <input type="color" id="color-picker" value="#a3c1da" onchange="applyBG(this.value)">
         </div>
         <input type="file" id="bg-upload" accept="image/*" style="display:none" onchange="uploadBG(this)">
-        <button class="btn-main" style="padding:8px; font-size:0.75rem; margin:0; box-shadow:none;" onpointerup="document.getElementById('bg-upload').click()">画像をえらぶ</button>
+        <div style="display:flex; gap:5px;">
+            <button class="btn-main" style="padding:8px; font-size:0.75rem; margin:0; box-shadow:none; flex:1;" onpointerup="document.getElementById('bg-upload').click()">画像えらぶ</button>
+            <button id="save-preset-btn" class="btn-main" style="padding:8px; font-size:0.75rem; margin:0; box-shadow:none; flex:1; background:var(--accent-green);" onpointerup="saveToSelectedPreset()">保存する</button>
+        </div>
     </div>
     <button class="bg-btn" onpointerup="toggleBGPanel()">…</button>
 </div>
@@ -171,39 +176,77 @@
     const options = { 4: ['今すぐ', '15分後', '30分後', '1時間後'], 5: ['特になし', '～1000円', '～2000円', '～3000円', '～5000円'] };
     const slotState = { 4: 0, 5: 0 };
     let q2_selected_chips = [];
-    let pressTimer;
-    let isLongPress = false;
+    
+    let selectedPresetId = null;
+    let currentBGValue = '#a3c1da';
 
     function toggleBGPanel() { const p = document.getElementById('bg-panel'); p.style.display = (p.style.display === 'block') ? 'none' : 'block'; }
-    function applyBG(val) { if(!val) return; const bg = document.getElementById('sky-bg'); if (val === 'default') { bg.style.backgroundImage = 'none'; bg.style.backgroundColor = '#a3c1da'; } else if (val.startsWith('data:image')) { bg.style.background = `url(${val}) center / cover no-repeat fixed`; } else { bg.style.backgroundImage = 'none'; bg.style.backgroundColor = val; } localStorage.setItem('sora_bg_v7_solid', val); }
     
-    function startLongPress(e, id) {
-        if(e.cancelable) e.preventDefault();
-        isLongPress = false;
-        pressTimer = setTimeout(() => {
-            isLongPress = true;
-            registerPreset(id);
-        }, 700);
+    function applyBG(val) { 
+        if(!val) return; 
+        currentBGValue = val;
+        const bg = document.getElementById('sky-bg'); 
+        if (val === 'default') { 
+            bg.style.backgroundImage = 'none'; 
+            bg.style.backgroundColor = '#a3c1da'; 
+            currentBGValue = '#a3c1da';
+        } else if (val.startsWith('data:image')) { 
+            bg.style.background = `url(${val}) center / cover no-repeat fixed`; 
+        } else { 
+            bg.style.backgroundImage = 'none'; 
+            bg.style.backgroundColor = val; 
+        } 
+        localStorage.setItem('sora_bg_v7_solid', val); 
     }
-
-    function endLongPress(id) {
-        clearTimeout(pressTimer);
-        if (!isLongPress) {
-            const color = document.getElementById(id).style.backgroundColor;
-            if (color) applyBG(color);
+    
+    function selectPreset(id) {
+        document.querySelectorAll('.dot').forEach(d => d.classList.remove('active-preset'));
+        const dot = document.getElementById(id);
+        dot.classList.add('active-preset');
+        selectedPresetId = id;
+        
+        const savedColor = dot.style.backgroundColor;
+        const savedImage = localStorage.getItem('sora_img_preset_v7_' + id);
+        
+        if (savedImage) {
+            applyBG(savedImage);
+        } else if (savedColor) {
+            applyBG(savedColor);
         }
     }
 
-    function registerPreset(id) { 
-        const color = document.getElementById('color-picker').value; 
-        document.getElementById(id).style.backgroundColor = color; 
-        localStorage.setItem('sora_preset_v7_' + id, color); 
-        alert("プリセットを保存したよ！"); 
+    function saveToSelectedPreset() {
+        if (!selectedPresetId) return alert("保存先の○をえらんでね！");
+        const dot = document.getElementById(selectedPresetId);
+        
+        if (currentBGValue.startsWith('data:image')) {
+            dot.style.backgroundImage = `url(${currentBGValue})`;
+            dot.style.backgroundSize = 'cover';
+            localStorage.setItem('sora_img_preset_v7_' + selectedPresetId, currentBGValue);
+            localStorage.removeItem('sora_preset_v7_' + selectedPresetId);
+        } else {
+            dot.style.backgroundImage = 'none';
+            dot.style.backgroundColor = currentBGValue;
+            localStorage.setItem('sora_preset_v7_' + selectedPresetId, currentBGValue);
+            localStorage.removeItem('sora_img_preset_v7_' + selectedPresetId);
+        }
+        alert("ここに保存したよ！");
     }
+
     function uploadBG(input) { if (input.files?.[0]) { const reader = new FileReader(); reader.onload = (e) => applyBG(e.target.result); reader.readAsDataURL(input.files[0]); } }
     
     function initSlots() { 
-        ['p1', 'p2', 'p3'].forEach(id => { const saved = localStorage.getItem('sora_preset_v7_' + id); if(saved) document.getElementById(id).style.backgroundColor = saved; }); 
+        ['p1', 'p2', 'p3'].forEach(id => { 
+            const savedColor = localStorage.getItem('sora_preset_v7_' + id); 
+            const savedImage = localStorage.getItem('sora_img_preset_v7_' + id);
+            const dot = document.getElementById(id);
+            if(savedImage) {
+                dot.style.backgroundImage = `url(${savedImage})`;
+                dot.style.backgroundSize = 'cover';
+            } else if(savedColor) {
+                dot.style.backgroundColor = savedColor; 
+            }
+        }); 
         const savedBG = localStorage.getItem('sora_bg_v7_solid'); if (savedBG) applyBG(savedBG);
         [4, 5].forEach(n => {
             const reel = document.querySelector(`#slot${n} .slot-reel`);
@@ -272,7 +315,6 @@
         } 
     }
 
-    // ここを修正：高精度GPS設定と住所表示の最適化
     function getPreciseLocation(n) {
         if (!navigator.geolocation) return alert("GPSが使えないようです");
         const btn = document.getElementById('gps-btn');
