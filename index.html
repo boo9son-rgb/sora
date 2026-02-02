@@ -215,7 +215,6 @@
         } 
     }
 
-    // --- 現在地の修正箇所 ---
     function getPreciseLocation(n) {
         if (!navigator.geolocation) return alert("GPSが使えないようです");
         const btn = document.getElementById('gps-btn');
@@ -224,8 +223,6 @@
             (pos) => {
                 const lat = pos.coords.latitude;
                 const lng = pos.coords.longitude;
-                // 「現在地」という文字に、場所を特定するためのGoogleマップのリンクを添える
-                // これにより、Gemini側で「現在地（付近の住所リンク）」として認識されます
                 const val = `現在地 (参照: https://www.google.com/maps?q=${lat},${lng})`;
                 data[`q${n}`] = val;
                 btn.innerText = "取得完了！";
@@ -243,9 +240,16 @@
         window.open('https://www.google.com/maps', '_blank');
         alert("地図で住所を確認して、入力欄にコピー＆ペーストしてください！");
     }
-    // ----------------------
 
-    async function finish() { const text = `【注文票】\n■構成：${data.q1}\n■目的：${data.q2.join('・')}\n■場所：${data.q3}\n■時間：${data.q4}\n■予算：${data.q5}\n■移動：${data.q6}\n■テーマ：${data.q7}\n■こだわり：${data.q8}\n■NG：${data.q9}`; try { await navigator.clipboard.writeText(text); alert("コピーしました！Geminiに貼り付けてね."); window.location.href = "https://gemini.google.com/"; } catch (err) { window.location.href = "https://gemini.google.com/"; } }
+    async function finish() { 
+        const text = `【注文票】\n■構成：${data.q1}\n■目的：${data.q2.join('・')}\n■場所：${data.q3}\n■時間：${data.q4}\n■予算：${data.q5}\n■移動：${data.q6}\n■テーマ：${data.q7}\n■こだわり：${data.q8}\n■NG：${data.q9}`; 
+        try { 
+            await navigator.clipboard.writeText(text); 
+            window.location.href = "https://gemini.google.com/"; 
+        } catch (err) { 
+            window.location.href = "https://gemini.google.com/"; 
+        } 
+    }
     window.onload = initSlots;
 </script>
 
