@@ -97,6 +97,9 @@
         
         textarea { height: 80px; resize: none; margin-top: 8px; }
         #summary { font-size:0.8rem; text-align:left; background:rgba(0,0,0,0.05); padding:12px; border-radius:10px; overflow-y:auto; flex:1; margin-bottom:5px; line-height:1.5; }
+
+        /* ボタンが決定された時のスタイル */
+        .btn-main.success { background: var(--accent-green) !important; box-shadow: 0 4px 0 #4a7a66 !important; }
     </style>
 </head>
 <body>
@@ -131,7 +134,7 @@
     <div class="card"><div class="window"><h2>テーマは？</h2><div class="inventory-grid"><div class="item-chip" onpointerup="quickSave(7, '特になし')">特になし</div><div class="item-chip" onpointerup="quickSave(7, 'カジュアル')">カジュアル</div><div class="item-chip" onpointerup="quickSave(7, 'ゆったり')">ゆったり</div><div class="item-chip" onpointerup="quickSave(7, '映え')">映え</div></div></div></div>
     <div class="card"><div class="window"><h2>こだわり</h2><textarea id="q8" placeholder="（なければ空欄）"></textarea><button class="btn-main" onpointerup="delayedNext()">次へ</button></div></div>
     <div class="card"><div class="window"><h2>ＮＧ！</h2><textarea id="q9" placeholder="（なければ空欄）"></textarea><button class="btn-main" onpointerup="delayedNext()">最終確認へ</button></div></div>
-    <div class="card"><div class="window"><h2>じゅんび OK！</h2><div id="summary"></div><button class="btn-main" style="background:var(--accent-orange); box-shadow:0 4px 0 #d47e4d;" onpointerup="finish()">これでけってい！</button></div></div>
+    <div class="card"><div class="window"><h2>じゅんび OK！</h2><div id="summary"></div><button id="btn-finish" class="btn-main" style="background:var(--accent-orange); box-shadow:0 4px 0 #d47e4d;" onpointerup="finish()">これでけってい！</button></div></div>
 </div>
 
 <script>
@@ -242,10 +245,19 @@
     }
 
     async function finish() { 
+        const btn = document.getElementById('btn-finish');
         const text = `【注文票】\n■構成：${data.q1}\n■目的：${data.q2.join('・')}\n■場所：${data.q3}\n■時間：${data.q4}\n■予算：${data.q5}\n■移動：${data.q6}\n■テーマ：${data.q7}\n■こだわり：${data.q8}\n■NG：${data.q9}`; 
+        
+        // ボタンを緑色にする
+        btn.classList.add('success');
+        btn.innerText = "コピー完了！";
+
         try { 
             await navigator.clipboard.writeText(text); 
-            window.location.href = "https://gemini.google.com/"; 
+            // 少しだけ色が変わったのを見せてから遷移
+            setTimeout(() => {
+                window.location.href = "https://gemini.google.com/"; 
+            }, 600);
         } catch (err) { 
             window.location.href = "https://gemini.google.com/"; 
         } 
