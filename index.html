@@ -16,7 +16,19 @@
             --shadow: 0 8px 30px rgba(0,0,0,0.12);
         }
 
-        * { -webkit-tap-highlight-color: transparent; }
+        * { 
+            -webkit-tap-highlight-color: transparent; 
+            /* iPhoneでの意図しないテキスト選択を全体的に防止 */
+            -webkit-touch-callout: none; 
+            -webkit-user-select: none; 
+            user-select: none;
+        }
+
+        /* 入力欄だけは選択・入力を許可する */
+        input, textarea { 
+            -webkit-user-select: text; 
+            user-select: text; 
+        }
 
         body, html { 
             margin: 0; padding: 0; height: 100%;
@@ -35,7 +47,7 @@
         .bg-btn { width: 44px; height: 44px; border: none; background: none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.1s; font-family: inherit; }
         .bg-panel { position: absolute; bottom: 60px; right: 0; background: var(--cloud-white); padding: 15px; border-radius: 15px; box-shadow: var(--shadow); display: none; backdrop-filter: blur(10px); width: 210px; border: 1px solid white; }
         .color-dots { display: flex; gap: 8px; justify-content: center; margin-bottom: 5px; flex-wrap: wrap; }
-        .dot { width: 34px; height: 34px; border-radius: 50%; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); -webkit-user-select: none; user-select: none; }
+        .dot { width: 34px; height: 34px; border-radius: 50%; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); touch-action: none; }
         .custom-color-wapper { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; font-size: 0.8rem; }
         #color-picker { border: none; width: 30px; height: 30px; cursor: pointer; background: none; }
 
@@ -110,9 +122,9 @@
     <div class="bg-panel" id="bg-panel">
         <div class="color-dots">
             <div class="dot" style="background-color: #a3c1da;" onpointerup="applyBG('default')"></div>
-            <div id="p1" class="dot" onpointerdown="startLongPress('p1')" onpointerup="endLongPress('p1')" onpointerleave="endLongPress('p1')" oncontextmenu="return false;"></div>
-            <div id="p2" class="dot" onpointerdown="startLongPress('p2')" onpointerup="endLongPress('p2')" onpointerleave="endLongPress('p2')" oncontextmenu="return false;"></div>
-            <div id="p3" class="dot" onpointerdown="startLongPress('p3')" onpointerup="endLongPress('p3')" onpointerleave="endLongPress('p3')" oncontextmenu="return false;"></div>
+            <div id="p1" class="dot" onpointerdown="startLongPress(event, 'p1')" onpointerup="endLongPress('p1')" onpointerleave="endLongPress('p1')" oncontextmenu="return false;"></div>
+            <div id="p2" class="dot" onpointerdown="startLongPress(event, 'p2')" onpointerup="endLongPress('p2')" onpointerleave="endLongPress('p2')" oncontextmenu="return false;"></div>
+            <div id="p3" class="dot" onpointerdown="startLongPress(event, 'p3')" onpointerup="endLongPress(event, 'p3')" onpointerleave="endLongPress('p3')" oncontextmenu="return false;"></div>
         </div>
         <div class="custom-color-wapper">
             <input type="color" id="color-picker" value="#a3c1da" onchange="applyBG(this.value)">
@@ -149,23 +161,32 @@
     function toggleBGPanel() { const p = document.getElementById('bg-panel'); p.style.display = (p.style.display === 'block') ? 'none' : 'block'; }
     function applyBG(val) { if(!val) return; const bg = document.getElementById('sky-bg'); if (val === 'default') { bg.style.backgroundImage = 'none'; bg.style.backgroundColor = '#a3c1da'; } else if (val.startsWith('data:image')) { bg.style.background = `url(${val}) center / cover no-repeat fixed`; } else { bg.style.backgroundImage = 'none'; bg.style.backgroundColor = val; } localStorage.setItem('sora_bg_v7_solid', val); }
     
-    function startLongPress(id) {
+    function startLongPress(e, id) {
+        // iPhone標準のメニューや選択を阻止
+        e.preventDefault();
         isLongPress = false;
         pressTimer = setTimeout(() => {
-            registerPreset(id);
             isLongPress = true;
+            registerPreset(id);
         }, 800);
     }
 
     function endLongPress(id) {
         clearTimeout(pressTimer);
+        // 長押し判定にならなかった時だけ、背景を適用する（クリック動作）
         if (!isLongPress) {
             const color = document.getElementById(id).style.backgroundColor;
             if (color) applyBG(color);
         }
     }
 
-    function registerPreset(id) { const color = document.getElementById('color-picker').value; document.getElementById(id).style.backgroundColor = color; localStorage.setItem('sora_preset_v7_' + id, color); alert("プリセットを保存したよ！"); }
+    function registerPreset(id) { 
+        const color = document.getElementById('color-picker').value; 
+        document.getElementById(id).style.backgroundColor = color; 
+        localStorage.setItem('sora_preset_v7_' + id, color); 
+        // 触覚フィードバックの代わりにアラートを表示して保存完了を知らせる
+        alert("プリセットを保存したよ！"); 
+    }
     function uploadBG(input) { if (input.files?.[0]) { const reader = new FileReader(); reader.onload = (e) => applyBG(e.target.result); reader.readAsDataURL(input.files[0]); } }
     
     function initSlots() { 
@@ -179,6 +200,11 @@
             reel.addEventListener('touchend', () => { slotState[n] = Math.max(0, Math.min(options[n].length - 1, slotState[n] - Math.round(moveY / 40))); reel.style.transform = `translateY(-${slotState[n] * 40}px)`; updateSlotStyle(n); moveY = 0; });
             updateSlotStyle(n);
         });
+
+        // iPhoneのコンテキストメニュー（右クリックメニュー）を全体で禁止
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        }, false);
     }
     function updateSlotStyle(n) { const items = document.querySelectorAll(`#slot${n} .slot-item`); items.forEach((it, idx) => { it.className = (idx === slotState[n] + 1) ? 'slot-item active' : 'slot-item'; }); }
 
