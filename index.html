@@ -16,13 +16,11 @@
             --shadow: 0 8px 30px rgba(0,0,0,0.12);
         }
 
-        * {
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { -webkit-tap-highlight-color: transparent; }
 
         body, html { 
             margin: 0; padding: 0; height: 100%;
-            font-family: 'DotGothic16', "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif; 
+            font-family: 'DotGothic16', sans-serif; 
             color: var(--text-dark); 
             overflow: hidden; 
         }
@@ -30,31 +28,14 @@
         .sky-bg { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background-color: var(--sky-blue); 
-            background-size: cover;
-            background-position: center;
             z-index: -1; 
         }
 
         .bg-settings { position: fixed; bottom: 20px; right: 20px; z-index: 10000; }
-        
-        .bg-btn { 
-            width: 44px; height: 44px; border: none; background: none; 
-            cursor: pointer; font-size: 2.2rem; display: flex; 
-            align-items: center; justify-content: center; 
-            color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            font-family: inherit;
-            transition: transform 0.1s ease;
-        }
-        .bg-btn:active { transform: translateY(4px); }
-
-        .bg-panel { 
-            position: absolute; bottom: 60px; right: 0; background: var(--cloud-white); 
-            padding: 15px; border-radius: 15px; box-shadow: var(--shadow); display: none; 
-            backdrop-filter: blur(10px); width: 210px; border: 1px solid white;
-        }
+        .bg-btn { width: 44px; height: 44px; border: none; background: none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.1s; font-family: inherit; }
+        .bg-panel { position: absolute; bottom: 60px; right: 0; background: var(--cloud-white); padding: 15px; border-radius: 15px; box-shadow: var(--shadow); display: none; backdrop-filter: blur(10px); width: 210px; border: 1px solid white; }
         .color-dots { display: flex; gap: 8px; justify-content: center; margin-bottom: 5px; flex-wrap: wrap; }
         .dot { width: 34px; height: 34px; border-radius: 50%; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .hint-text { font-size: 0.6rem; color: #888; margin-bottom: 10px; text-align: center; }
         .custom-color-wapper { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; font-size: 0.8rem; }
         #color-picker { border: none; width: 30px; height: 30px; cursor: pointer; background: none; }
 
@@ -62,72 +43,67 @@
         .card { min-width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; }
         
         .window { 
-            background: var(--cloud-white); 
-            backdrop-filter: blur(12px); 
+            background: var(--cloud-white); backdrop-filter: blur(12px); 
             border-radius: 20px; padding: 20px; width: 100%; max-width: 320px; 
             text-align: center; box-shadow: var(--shadow); border: 1px solid rgba(255, 255, 255, 0.6); 
-            height: 340px; 
-            display: flex; flex-direction: column; justify-content: space-between;
-            box-sizing: border-box;
+            height: 340px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;
         }
 
-        h2 { font-size: 1.0rem; margin-top: 0; margin-bottom: 10px; flex-shrink: 0; }
+        h2 { font-size: 1.0rem; margin-top: 0; margin-bottom: 10px; }
         
-        .inventory-grid { 
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; 
-            overflow-y: auto; padding: 4px; flex-grow: 1;
-            -webkit-overflow-scrolling: touch; 
-        }
+        .inventory-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; overflow-y: auto; padding: 4px; flex-grow: 1; }
         .inventory-grid::-webkit-scrollbar { display: none; }
 
         .item-chip { 
             background: white; border: 1px solid #ddd; border-radius: 10px; 
-            padding: 8px 4px; font-size: 0.8rem; cursor: pointer; 
-            transition: transform 0.1s ease, box-shadow 0.1s ease;
-            box-shadow: 0 4px 0 #ccc; display: flex; align-items: center; 
-            justify-content: center; min-height: 44px; box-sizing: border-box;
-            position: relative;
+            padding: 4px 6px; font-size: 0.85rem; cursor: pointer; 
+            box-shadow: 0 4px 0 #ccc; display: flex; align-items: center; justify-content: center; min-height: 44px; position: relative;
         }
-        .item-chip:active { 
-            transform: translateY(4px);
-            box-shadow: 0 0 0 #ccc;
-        }
-        .item-chip.selected { 
-            background: var(--accent-orange); color: white; border-color: transparent; 
-            box-shadow: 0 4px 0 #d47e4d; 
-        }
-        .item-chip.selected:active { 
-            box-shadow: 0 0 0 #d47e4d; 
-        }
+        .item-chip:active { transform: translateY(4px); box-shadow: 0 0 0 #ccc; background: var(--accent-orange); color: white; border-color: transparent; }
+        .item-chip.selected { background: var(--accent-orange); color: white; border-color: transparent; box-shadow: 0 4px 0 #d47e4d; }
 
-        .slot-container { position: relative; height: 120px; overflow: hidden; margin: 5px 0; background: rgba(0,0,0,0.05); border-radius: 12px; flex-shrink: 0; }
+        .slot-container { position: relative; height: 120px; overflow: hidden; margin: 5px 0; background: rgba(0,0,0,0.05); border-radius: 12px; }
         .slot-reel { transition: transform 0.3s ease-out; }
-        .slot-item { height: 40px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; color: #888; }
+        .slot-item { height: 40px; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; color: #888; }
         .slot-item.active { color: var(--text-dark); font-weight: bold; font-size: 1.1rem; }
         .slot-overlay { position: absolute; top: 40px; left: 0; width: 100%; height: 40px; pointer-events: none; border-top: 1px solid rgba(0,0,0,0.1); border-bottom: 1px solid rgba(0,0,0,0.1); background: rgba(0, 0, 0, 0.03); }
 
-        .btn-main { width: 100%; margin-top: 10px; padding: 12px; background: var(--text-dark); color: white; border: none; border-radius: 10px; font-family: inherit; font-size: 0.9rem; box-shadow: 0 4px 0 #222; cursor: pointer; flex-shrink: 0; position: relative; transition: transform 0.1s ease, box-shadow 0.1s ease; }
+        .btn-main { width: 100%; margin-top: 10px; padding: 12px; background: var(--text-dark); color: white; border: none; border-radius: 10px; font-family: inherit; font-size: 0.9rem; box-shadow: 0 4px 0 #222; cursor: pointer; position: relative; }
         .btn-main:active { transform: translateY(4px); box-shadow: 0 0 0 #222; }
 
-        .btn-back { 
-            position: fixed; bottom: 20px; left: 15px; border: none; background: none; 
-            width: 44px; height: 44px; z-index: 1001; display:none; 
-            cursor: pointer; font-size: 2.2rem; align-items: center; justify-content: center; 
-            color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            font-family: inherit;
-            transition: transform 0.1s ease;
-        }
-        .btn-back:active { transform: translateY(4px); }
+        .btn-back { position: fixed; bottom: 20px; left: 15px; border: none; background: none; width: 44px; height: 44px; z-index: 1001; display:none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); font-family: inherit; }
         
-        .free-input, textarea { width: 100%; border: 1px solid #ddd; border-radius: 10px; padding: 10px; margin-top: 8px; font-family: inherit; box-sizing: border-box; font-size: 0.85rem; outline: none; flex-shrink: 0; }
-        textarea { height: 80px; resize: none; }
+        .free-input-wrapper { display: flex; gap: 8px; width: 100%; margin-top: 8px; }
+        .free-input, textarea { width: 100%; border: 1px solid #ddd; border-radius: 10px; padding: 10px; font-family: inherit; box-sizing: border-box; font-size: 0.85rem; outline: none; }
+        
+        .btn-dot-ok { 
+            width: 44px; height: 44px; background: var(--accent-green); color: white; 
+            border: none; border-radius: 50%; font-family: inherit; 
+            box-shadow: 0 4px 0 #4a7a66; cursor: pointer; display: flex; 
+            align-items: center; justify-content: center; flex-shrink: 0;
+            position: relative;
+        }
+        .btn-dot-ok:active { transform: translateY(4px); box-shadow: 0 0 0 #4a7a66; }
+        
+        /* 1ピクセルの美しさにこだわった黄金比ドットチェック */
+        .pixel-check {
+            width: 16px; height: 16px; background-color: white;
+            clip-path: polygon(
+                /* 外枠の定義：左から右へ階段状に */
+                0% 50%, 12.5% 50%, 12.5% 62.5%, 25% 62.5%, 25% 75%, 37.5% 75%, 37.5% 87.5%, 50% 87.5%, 
+                50% 75%, 62.5% 75%, 62.5% 62.5%, 75% 62.5%, 75% 50%, 87.5% 50%, 87.5% 37.5%, 100% 37.5%, 
+                100% 12.5%, 87.5% 12.5%, 87.5% 25%, 75% 25%, 75% 37.5%, 62.5% 37.5%, 62.5% 50%, 50% 50%, 
+                50% 62.5%, 37.5% 62.5%, 37.5% 50%, 25% 50%, 25% 37.5%, 12.5% 37.5%, 12.5% 50%, 0% 50%
+            );
+        }
+        
+        textarea { height: 80px; resize: none; margin-top: 8px; }
         #summary { font-size:0.8rem; text-align:left; background:rgba(0,0,0,0.05); padding:12px; border-radius:10px; overflow-y:auto; flex:1; margin-bottom:5px; line-height:1.5; }
     </style>
 </head>
 <body>
 
 <button class="btn-back" id="btn-back" onpointerup="prev()">＜</button>
-
 <div class="sky-bg" id="sky-bg"></div>
 
 <div class="bg-settings">
@@ -138,9 +114,7 @@
             <div id="p2" class="dot" onpointerup="applyBG(this.style.backgroundColor)" oncontextmenu="registerPreset('p2'); return false;"></div>
             <div id="p3" class="dot" onpointerup="applyBG(this.style.backgroundColor)" oncontextmenu="registerPreset('p3'); return false;"></div>
         </div>
-        <div class="hint-text">長押しで現在の色を登録</div>
         <div class="custom-color-wapper">
-            <span>えらぶ:</span>
             <input type="color" id="color-picker" value="#a3c1da" onchange="applyBG(this.value)">
         </div>
         <input type="file" id="bg-upload" accept="image/*" style="display:none" onchange="uploadBG(this)">
@@ -150,13 +124,13 @@
 </div>
 
 <div class="viewport" id="viewport">
-    <div class="card"><div class="window"><h2>だれと あそぶ？</h2><div class="inventory-grid"><div class="item-chip" onpointerup="quickSave(1, 'ひとり')">ひとり</div><div class="item-chip" onpointerup="quickSave(1, '彼女と2人')">彼女</div><div class="item-chip" onpointerup="quickSave(1, '友達(2-4人)')">友達</div> <div class="item-chip" onpointerup="quickSave(1, '友達(大人数)')">友達(大人数)</div><div class="item-chip" onpointerup="quickSave(1, '会社')">会社</div><div class="item-chip" onpointerup="quickSave(1, '家族')">家族</div></div><input type="text" id="q1_free" class="free-input" placeholder="そのほか入力..." onkeydown="if(event.key==='Enter') save(1, this.value)"></div></div>
-    <div class="card"><div class="window"><h2>なにを したい？</h2><div class="inventory-grid" id="q2_grid"><div class="item-chip" onpointerup="toggleItem(this, 'モーニング')">モーニング</div><div class="item-chip" onpointerup="toggleItem(this, 'ランチ')">ランチ</div><div class="item-chip" onpointerup="toggleItem(this, 'カフェ')">カフェ</div><div class="item-chip" onpointerup="toggleItem(this, 'ディナー')">ディナー</div><div class="item-chip" onpointerup="toggleItem(this, 'バータイム')">バータイム</div><div class="item-chip" onpointerup="toggleItem(this, '深夜')">深夜</div><div class="item-chip" onpointerup="toggleItem(this, 'コーヒー(テイクアウト)')">コーヒー(持ち帰り)</div><div class="item-chip" onpointerup="toggleItem(this, 'パン')">パン</div><div class="item-chip" onpointerup="toggleItem(this, 'スイーツ・お菓子')">スイーツ</div><div class="item-chip" onpointerup="toggleItem(this, 'イベント')">イベント</div><div class="item-chip" onpointerup="toggleItem(this, '遊び')">遊び</div><div class="item-chip" onpointerup="toggleItem(this, 'のんびり')">のんびり</div><div class="item-chip" onpointerup="toggleItem(this, '観光')">観光</div><div class="item-chip" onpointerup="toggleItem(this, 'お買い物')">お買い物</div></div><input type="text" id="q2_free" class="free-input" placeholder="そのほか入力..."><button class="btn-main" onpointerup="nextMulti()">これでいく！</button></div></div>
-    <div class="card"><div class="window"><h2>どこへ むかう？</h2><div class="inventory-grid"><div class="item-chip" id="gps-btn" onpointerup="getPreciseLocation(3)">現在地を取得</div><div class="item-chip" onpointerup="quickSave(3, '本通周辺')">本通周辺</div><div class="item-chip" onpointerup="quickSave(3, '広島駅')">広島駅</div><div class="item-chip" style="background: rgba(103, 163, 139, 0.1); border: 1px dashed var(--accent-green);" onpointerup="openMap(3)">地図を開く</div></div><input type="text" id="q3_free" class="free-input" placeholder="場所・住所を入力..." onkeydown="if(event.key==='Enter') save(3, this.value)"></div></div>
-    <div class="card"><div class="window"><h2>いつ いく？</h2><div class="slot-container" id="slot4"><div class="slot-reel"></div><div class="slot-overlay"></div></div><input type="text" id="q4_free" class="free-input" placeholder="自由指定はこちら..."><button class="btn-main" onpointerup="saveSlot(4)">この時間に！</button></div></div>
+    <div class="card"><div class="window"><h2>だれと あそぶ？</h2><div class="inventory-grid"><div class="item-chip" onpointerup="quickSave(1, 'ひとり')">ひとり</div><div class="item-chip" onpointerup="quickSave(1, '彼女と2人')">彼女</div><div class="item-chip" onpointerup="quickSave(1, '友達(2-4人)')">友達</div> <div class="item-chip" onpointerup="quickSave(1, '友達(大人数)')">友達(大人数)</div><div class="item-chip" onpointerup="quickSave(1, '会社')">会社</div><div class="item-chip" onpointerup="quickSave(1, '家族')">家族</div></div><div class="free-input-wrapper"><input type="text" id="q1_free" class="free-input" placeholder="そのほか..." onkeydown="if(event.key==='Enter') save(1, this.value)"><button class="btn-dot-ok" onpointerup="save(1, document.getElementById('q1_free').value)"><div class="pixel-check"></div></button></div></div></div>
+    <div class="card"><div class="window"><h2>なにを したい？</h2><div class="inventory-grid" id="q2_grid"><div class="item-chip" onpointerup="toggleItem(this, 'モーニング')">モーニング</div><div class="item-chip" onpointerup="toggleItem(this, 'ランチ')">ランチ</div><div class="item-chip" onpointerup="toggleItem(this, 'カフェ')">カフェ</div><div class="item-chip" onpointerup="toggleItem(this, 'ディナー')">ディナー</div><div class="item-chip" onpointerup="toggleItem(this, 'バータイム')">バータイム</div><div class="item-chip" onpointerup="toggleItem(this, '深夜')">深夜</div><div class="item-chip" onpointerup="toggleItem(this, 'パン')">パン</div><div class="item-chip" onpointerup="toggleItem(this, 'スイーツ')">スイーツ</div><div class="item-chip" onpointerup="toggleItem(this, '遊び')">遊び</div><div class="item-chip" onpointerup="toggleItem(this, 'のんびり')">のんびり</div></div><input type="text" id="q2_free" class="free-input" placeholder="そのほか入力..."><button class="btn-main" onpointerup="nextMulti()">これでいく！</button></div></div>
+    <div class="card"><div class="window"><h2>どこへ むかう？</h2><div class="inventory-grid"><div class="item-chip" id="gps-btn" onpointerup="getPreciseLocation(3)">現在地を取得</div><div class="item-chip" onpointerup="quickSave(3, '本通周辺')">本通周辺</div><div class="item-chip" onpointerup="quickSave(3, '広島駅')">広島駅</div><div class="item-chip" style="background: rgba(103, 163, 139, 0.1); border: 1px dashed var(--accent-green);" onpointerup="openMap(3)">地図を開く</div></div><div class="free-input-wrapper"><input type="text" id="q3_free" class="free-input" placeholder="場所・住所..." onkeydown="if(event.key==='Enter') save(3, this.value)"><button class="btn-dot-ok" onpointerup="save(3, document.getElementById('q3_free').value)"><div class="pixel-check"></div></button></div></div></div>
+    <div class="card"><div class="window"><h2>いつ いく？</h2><div class="slot-container" id="slot4"><div class="slot-reel"></div><div class="slot-overlay"></div></div><div class="free-input-wrapper"><input type="text" id="q4_free" class="free-input" placeholder="自由指定..." onkeydown="if(event.key==='Enter') saveSlot(4)"><button class="btn-dot-ok" onpointerup="saveSlot(4)"><div class="pixel-check"></div></button></div></div></div>
     <div class="card"><div class="window"><h2>よさんは？</h2><div class="slot-container" id="slot5"><div class="slot-reel"></div><div class="slot-overlay"></div></div><button class="btn-main" onpointerup="saveSlot(5)">この予算で！</button></div></div>
     <div class="card"><div class="window"><h2>どうやって いく？</h2><div class="inventory-grid"><div class="item-chip" onpointerup="quickSave(6, '徒歩')">あるき</div> <div class="item-chip" onpointerup="quickSave(6, '公共交通機関')">電車・バス</div><div class="item-chip" onpointerup="quickSave(6, '車')">車</div><div class="item-chip" onpointerup="quickSave(6, 'タクシー')">タクシー</div></div></div></div>
-    <div class="card"><div class="window"><h2>テーマは？</h2><div class="inventory-grid"><div class="item-chip" onpointerup="quickSave(7, '特になし')">特になし</div><div class="item-chip" onpointerup="quickSave(7, 'カジュアル')">カジュアル</div><div class="item-chip" onpointerup="quickSave(7, 'ゆったり・静か')">ゆったり</div><div class="item-chip" onpointerup="quickSave(7, '映え・トレンド')">映え</div><div class="item-chip" onpointerup="quickSave(7, '特別')">特別</div><div class="item-chip" onpointerup="quickSave(7, '隠れ家・穴場')">穴場</div></div></div></div>
+    <div class="card"><div class="window"><h2>テーマは？</h2><div class="inventory-grid"><div class="item-chip" onpointerup="quickSave(7, '特になし')">特になし</div><div class="item-chip" onpointerup="quickSave(7, 'カジュアル')">カジュアル</div><div class="item-chip" onpointerup="quickSave(7, 'ゆったり')">ゆったり</div><div class="item-chip" onpointerup="quickSave(7, '映え')">映え</div></div></div></div>
     <div class="card"><div class="window"><h2>こだわり</h2><textarea id="q8" placeholder="（なければ空欄）"></textarea><button class="btn-main" onpointerup="delayedNext()">次へ</button></div></div>
     <div class="card"><div class="window"><h2>ＮＧ！</h2><textarea id="q9" placeholder="（なければ空欄）"></textarea><button class="btn-main" onpointerup="delayedNext()">最終確認へ</button></div></div>
     <div class="card"><div class="window"><h2>じゅんび OK！</h2><div id="summary"></div><button class="btn-main" style="background:var(--accent-orange); box-shadow:0 4px 0 #d47e4d;" onpointerup="finish()">これでけってい！</button></div></div>
@@ -166,35 +140,86 @@
     let step = 0;
     let startY = 0, moveY = 0; 
     const data = { q1:'', q2:[], q3:'', q4:'', q5:'', q6:'', q7:'', q8:'', q9:'' };
-    const options = { 4: ['今すぐ', '15分後', '30分後', '1時間後'], 5: ['特になし', '～1000円', '～2000円', '～3000円', '～5000円', '～10000円', '上限なし'] };
+    const options = { 4: ['今すぐ', '15分後', '30分後', '1時間後'], 5: ['特になし', '～1000円', '～2000円', '～3000円', '～5000円'] };
     const slotState = { 4: 0, 5: 0 };
-    function toggleBGPanel() { const p = document.getElementById('bg-panel'); p.style.display = (p.style.display === 'block') ? 'none' : 'block'; }
-    function applyBG(val) { if(!val) return; const bg = document.getElementById('sky-bg'); if (val === 'default') { bg.style.backgroundImage = 'none'; bg.style.backgroundColor = '#a3c1da'; } else if (val.startsWith('data:image')) { bg.style.background = `url(${val}) center / cover no-repeat fixed`; } else { bg.style.backgroundImage = 'none'; bg.style.backgroundColor = val; document.getElementById('color-picker').value = rgbToHex(val); } localStorage.setItem('sora_bg_v7_solid', val); }
-    function registerPreset(id) { const color = document.getElementById('color-picker').value; document.getElementById(id).style.backgroundColor = color; localStorage.setItem('sora_preset_v7_' + id, color); }
-    document.querySelectorAll('.dot').forEach(dot => { let timer; dot.addEventListener('touchstart', () => { if(dot.id) timer = setTimeout(() => registerPreset(dot.id), 800); }); dot.addEventListener('touchend', () => clearTimeout(timer)); });
-    function rgbToHex(rgb) { if (rgb.startsWith('#')) return rgb; const match = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/); if (!match) return '#a3c1da'; const hex = (x) => ("0" + parseInt(x).toString(16)).slice(-2); return "#" + hex(match[1]) + hex(match[2]) + hex(match[3]); }
-    function uploadBG(input) { if (input.files?.[0]) { const reader = new FileReader(); reader.onload = (e) => applyBG(e.target.result); reader.readAsDataURL(input.files[0]); } }
-    function loadBG() { ['p1', 'p2', 'p3'].forEach(id => { const saved = localStorage.getItem('sora_preset_v7_' + id); if(saved) document.getElementById(id).style.backgroundColor = saved; }); const savedBG = localStorage.getItem('sora_bg_v7_solid'); if (savedBG) applyBG(savedBG); }
-    
-    function openMap(n) { const addr = document.getElementById(`q${n}_free`).value; const url = addr ? `https://www.google.com/maps/search/${encodeURIComponent(addr)}` : `https://www.google.com/maps/`; window.open(url, '_blank'); }
-    
-    async function getPreciseLocation(n) { const btn = document.getElementById('gps-btn'); const input = document.getElementById(`q${n}_free`); if (!navigator.geolocation) return alert("非対応ブラウザです"); btn.innerText = "取得中..."; navigator.geolocation.getCurrentPosition(async (pos) => { const {latitude: lat, longitude: lon} = pos.coords; try { const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=ja`); const resData = await res.json(); input.value = resData.display_name || `${lat}, ${lon}`; } catch (e) { input.value = `${lat}, ${lon}`; } data[`q${n}`] = input.value; btn.innerText = "取得完了！"; setTimeout(next, 600); }, () => { alert("失敗しました"); btn.innerText = "現在地を取得"; }, { enableHighAccuracy: true, timeout: 5000 }); }
-    function initSlots() { loadBG(); [4, 5].forEach(n => { const reel = document.querySelector(`#slot${n} .slot-reel`); reel.innerHTML = `<div class="slot-item"></div>` + options[n].map(opt => `<div class="slot-item">${opt}</div>`).join('') + `<div class="slot-item"></div>`; reel.addEventListener('touchstart', e => { startY = e.touches[0].pageY; }, {passive: true}); reel.addEventListener('touchmove', e => { moveY = e.touches[0].pageY - startY; reel.style.transform = `translateY(${-(slotState[n] * 40) + moveY}px)`; }, {passive: true}); reel.addEventListener('touchend', () => { slotState[n] = Math.max(0, Math.min(options[n].length - 1, slotState[n] - Math.round(moveY / 40))); reel.style.transform = `translateY(-${slotState[n] * 40}px)`; updateSlotStyle(n); moveY = 0; }); updateSlotStyle(n); }); }
-    function updateSlotStyle(n) { const items = document.querySelectorAll(`#slot${n} .slot-item`); items.forEach((it, idx) => it.className = (idx === slotState[n] + 1) ? 'slot-item active' : 'slot-item'); }
+    let q2_selected_chips = [];
 
-    const WAIT_TIME = 120; 
-    function saveSlot(n) { data[`q${n}`] = document.getElementById(`q${n}_free`)?.value || options[n][slotState[n]]; setTimeout(next, WAIT_TIME); }
-    function quickSave(n, val) { data[`q${n}`] = val; const input = document.getElementById(`q${n}_free`); if(input) input.value = val; setTimeout(next, WAIT_TIME); }
-    function save(n, val) { data[`q${n}`] = val; setTimeout(next, WAIT_TIME); }
-    function toggleItem(el, val) { el.classList.toggle('selected'); const idx = data.q2.indexOf(val); if (idx > -1) data.q2.splice(idx, 1); else data.q2.push(val); }
-    function nextMulti() { const free = document.getElementById('q2_free').value; if(free) data.q2.push(free); if(!data.q2.length) return alert("なにか選んでね！"); setTimeout(next, WAIT_TIME); }
-    function delayedNext() { setTimeout(next, WAIT_TIME); }
+    function toggleBGPanel() { const p = document.getElementById('bg-panel'); p.style.display = (p.style.display === 'block') ? 'none' : 'block'; }
+    function applyBG(val) { if(!val) return; const bg = document.getElementById('sky-bg'); if (val === 'default') { bg.style.backgroundImage = 'none'; bg.style.backgroundColor = '#a3c1da'; } else if (val.startsWith('data:image')) { bg.style.background = `url(${val}) center / cover no-repeat fixed`; } else { bg.style.backgroundImage = 'none'; bg.style.backgroundColor = val; } localStorage.setItem('sora_bg_v7_solid', val); }
+    function registerPreset(id) { const color = document.getElementById('color-picker').value; document.getElementById(id).style.backgroundColor = color; localStorage.setItem('sora_preset_v7_' + id, color); }
+    function uploadBG(input) { if (input.files?.[0]) { const reader = new FileReader(); reader.onload = (e) => applyBG(e.target.result); reader.readAsDataURL(input.files[0]); } }
     
+    function initSlots() { 
+        ['p1', 'p2', 'p3'].forEach(id => { const saved = localStorage.getItem('sora_preset_v7_' + id); if(saved) document.getElementById(id).style.backgroundColor = saved; }); 
+        const savedBG = localStorage.getItem('sora_bg_v7_solid'); if (savedBG) applyBG(savedBG);
+        [4, 5].forEach(n => {
+            const reel = document.querySelector(`#slot${n} .slot-reel`);
+            reel.innerHTML = `<div class="slot-item"></div>` + options[n].map(opt => `<div class="slot-item">${opt}</div>`).join('') + `<div class="slot-item"></div>`;
+            reel.addEventListener('touchstart', e => { startY = e.touches[0].pageY; }, {passive: true});
+            reel.addEventListener('touchmove', e => { moveY = e.touches[0].pageY - startY; reel.style.transform = `translateY(${-(slotState[n] * 40) + moveY}px)`; }, {passive: true});
+            reel.addEventListener('touchend', () => { slotState[n] = Math.max(0, Math.min(options[n].length - 1, slotState[n] - Math.round(moveY / 40))); reel.style.transform = `translateY(-${slotState[n] * 40}px)`; updateSlotStyle(n); moveY = 0; });
+            updateSlotStyle(n);
+        });
+    }
+    function updateSlotStyle(n) { const items = document.querySelectorAll(`#slot${n} .slot-item`); items.forEach((it, idx) => { it.className = (idx === slotState[n] + 1) ? 'slot-item active' : 'slot-item'; }); }
+
+    function quickSave(n, val) { data[`q${n}`] = val; setTimeout(next, 120); }
+    function save(n, val) { if(!val) return alert("入力してね！"); data[`q${n}`] = val; setTimeout(next, 120); }
+    
+    function saveSlot(n) { 
+        let val = document.getElementById(`q${n}_free`)?.value || options[n][slotState[n]];
+        if (n === 4) {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const date = now.getDate();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            val = `${val}(現時刻:${year}/${month}/${date} ${timeStr})`;
+        }
+        data[`q${n}`] = val; 
+        setTimeout(next, 120); 
+    }
+
+    function toggleItem(el, val) { 
+        el.classList.toggle('selected'); 
+        const idx = q2_selected_chips.indexOf(val); 
+        if (idx > -1) q2_selected_chips.splice(idx, 1); else q2_selected_chips.push(val); 
+    }
+    
+    function nextMulti() { 
+        const free = document.getElementById('q2_free').value; 
+        data.q2 = [...q2_selected_chips];
+        if(free) data.q2.push(free); 
+        if(!data.q2.length) return alert("なにか選んでね！"); 
+        setTimeout(next, 120); 
+    }
+
+    function delayedNext() { setTimeout(next, 120); }
     function next() { if(step < 9) { step++; update(); } }
     function prev() { if(step > 0) { step--; update(); } }
-    function update() { document.getElementById('viewport').style.transform = `translateX(-${step * 100}%)`; document.getElementById('btn-back').style.display = step > 0 ? 'flex' : 'none'; if(step === 9) { data.q8 = document.getElementById('q8').value || 'なし'; data.q9 = document.getElementById('q9').value || 'なし'; document.getElementById('summary').innerHTML = `<b>■だれと：</b>${data.q1}<br><b>■なにを：</b>${data.q2.join('・')}<br><b>■場所：</b>${data.q3}<br><b>■時間：</b>${data.q4}<br><b>■予算：</b>${data.q5}<br><b>■移動：</b>${data.q6}<br><b>■テーマ：</b>${data.q7}`; } }
-    async function finish() { const text = `【注文票】\n■構成・人数：${data.q1}\n■目的：${data.q2.join('・')}\n■場所：${data.q3}\n■日程・時間帯：${data.q4}\n■予算：${data.q5}\n■移動手段：${data.q6}\n■テーマ：${data.q7}\n■こだわり：${data.q8}\n■NG条件：${data.q9}`; try { await navigator.clipboard.writeText(text); const btn = document.querySelector('.btn-main[onpointerup="finish()"]'); btn.innerText = "コピー完了！移動します..."; btn.style.background = "#67a38b"; setTimeout(() => { window.location.href = "https://gemini.google.com/"; }, 300); } catch (err) { window.location.href = "https://gemini.google.com/"; } }
+    function update() { 
+        document.getElementById('viewport').style.transform = `translateX(-${step * 100}%)`; 
+        document.getElementById('btn-back').style.display = step > 0 ? 'flex' : 'none'; 
+        if(step === 9) { 
+            data.q8 = document.getElementById('q8').value || 'なし'; 
+            data.q9 = document.getElementById('q9').value || 'なし'; 
+            document.getElementById('summary').innerHTML = `
+                <b>■だれと：</b>${data.q1}<br>
+                <b>■なにを：</b>${data.q2.join('・')}<br>
+                <b>■場所：</b>${data.q3}<br>
+                <b>■時間：</b>${data.q4}<br>
+                <b>■予算：</b>${data.q5}<br>
+                <b>■移動：</b>${data.q6}<br>
+                <b>■テーマ：</b>${data.q7}<br>
+                <b>■こだわり：</b>${data.q8}<br>
+                <b>■ＮＧ：</b>${data.q9}
+            `; 
+        } 
+    }
+    async function finish() { const text = `【注文票】\n■構成：${data.q1}\n■目的：${data.q2.join('・')}\n■場所：${data.q3}\n■時間：${data.q4}\n■予算：${data.q5}\n■移動：${data.q6}\n■テーマ：${data.q7}\n■こだわり：${data.q8}\n■NG：${data.q9}`; try { await navigator.clipboard.writeText(text); alert("コピーしました！Geminiに貼り付けてね."); window.location.href = "https://gemini.google.com/"; } catch (err) { window.location.href = "https://gemini.google.com/"; } }
     window.onload = initSlots;
 </script>
+
 </body>
 </html>
+
