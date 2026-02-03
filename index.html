@@ -23,16 +23,18 @@
             touch-action: pan-x pan-y;
         }
 
-        /* html/bodyを透明にして、背景変更がすぐ見えるようにする */
+        /* html/body全体に背景色を同期させる */
         body, html { 
             margin: 0; padding: 0; 
-            height: 100dvh; width: 100vw;
+            height: 100%; width: 100%;
+            height: 100dvh;
             font-family: 'DotGothic16', sans-serif; 
             color: var(--text-dark); 
             overflow: hidden; 
             position: fixed;
             overscroll-behavior: none;
-            transition: background-color 0.3s ease; /* 色変化を滑らかに */
+            /* 初期の背景色 */
+            background-color: var(--sky-blue);
         }
 
         input, textarea { 
@@ -40,11 +42,10 @@
             user-select: text !important; 
         }
 
-        /* 実際の背景を司るレイヤー */
         .sky-bg { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            z-index: -2; 
-            transition: background 0.3s ease;
+            z-index: -1; 
+            background-color: transparent; /* body側で制御するため透明に */
         }
 
         .bg-settings { position: fixed; bottom: 20px; right: 20px; z-index: 10000; }
@@ -74,6 +75,7 @@
             border-radius: 20px; padding: 20px; width: 100%; max-width: 320px; 
             text-align: center; box-shadow: var(--shadow); border: 1px solid rgba(255, 255, 255, 0.6); 
             height: 360px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;
+            /* ノッチを避けるために少し下にマージンを持つ場合 */
             margin-top: env(safe-area-inset-top);
         }
 
@@ -136,7 +138,10 @@
             <div id="p3" class="dot" onpointerup="selectPreset('p3')"></div>
         </div>
         <div class="custom-color-wapper">
-            <input type="color" id="color-picker" value="#a3c1da" oninput="applyBG(this.value)" onchange="applyBG(this.value)">
+            <input type="color" id="color-picker" value="#a3c1da" onchange="applyBG(this.value)">
+            <button class="btn-dot-ok" style="width:30px; height:30px; box-shadow:none;" onpointerup="location.reload()">
+                <div style="font-size:12px; font-weight:bold;">↻</div>
+            </button>
         </div>
         <input type="file" id="bg-upload" accept="image/*" style="display:none" onchange="uploadBG(this)">
         <div style="display:flex; gap:5px;">
@@ -178,30 +183,25 @@
 
     function toggleBGPanel() { const p = document.getElementById('bg-panel'); p.style.display = (p.style.display === 'block') ? 'none' : 'block'; }
     
-    // 背景を即座に反映させる関数
     function applyBG(val) { 
         if(!val) return; 
         currentBGValue = val;
-        const bgElement = document.getElementById('sky-bg'); 
+        const bg = document.getElementById('sky-bg'); 
         
-        // 即座にhtml/body/sky-bgの全てに命令を出す
+        // ノッチ対策：bodyとhtmlの背景色も変更する
         if (val === 'default') { 
-            const defColor = '#a3c1da';
-            document.body.style.backgroundColor = defColor;
-            document.documentElement.style.backgroundColor = defColor;
-            bgElement.style.background = 'none';
-            bgElement.style.backgroundColor = 'transparent';
+            document.body.style.backgroundColor = '#a3c1da';
+            document.documentElement.style.backgroundColor = '#a3c1da';
+            bg.style.backgroundImage = 'none'; 
+            currentBGValue = '#a3c1da';
         } else if (val.startsWith('data:image')) { 
-            // 画像の場合：bodyは一旦暗めの色にして、bg層に画像を表示
-            document.body.style.backgroundColor = '#000';
-            document.documentElement.style.backgroundColor = '#000';
-            bgElement.style.background = `url(${val}) center / cover no-repeat fixed`; 
+            // 画像の場合はbodyではなくsky-bg要素で表示
+            bg.style.background = `url(${val}) center / cover no-repeat fixed`; 
         } else { 
-            // 単色の場合：全ての層に同じ色を強制的に適用
+            // 単色の場合は全体の色を書き換える
             document.body.style.backgroundColor = val;
             document.documentElement.style.backgroundColor = val;
-            bgElement.style.background = 'none';
-            bgElement.style.backgroundColor = val;
+            bg.style.backgroundImage = 'none'; 
         } 
         localStorage.setItem('sora_bg_v7_solid', val); 
     }
@@ -211,14 +211,9 @@
         const dot = document.getElementById(id);
         dot.classList.add('active-preset');
         selectedPresetId = id;
-        
-        // 保存されているデータを取得
+        const savedColor = dot.style.backgroundColor;
         const savedImage = localStorage.getItem('sora_img_preset_v7_' + id);
-        const savedColor = localStorage.getItem('sora_preset_v7_' + id);
-        
-        if (savedImage) applyBG(savedImage);
-        else if (savedColor) applyBG(savedColor);
-        else applyBG('default'); // 何もなければデフォルト
+        if (savedImage) applyBG(savedImage); else if (savedColor) applyBG(savedColor);
     }
 
     function saveToSelectedPreset() {
