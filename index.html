@@ -229,6 +229,9 @@
             bg.style.backgroundImage = 'none'; 
             currentBGValue = '#a3c1da';
         } else if (val.startsWith('data:image')) { 
+            // 画像のときは背後のbody背景色を透明にすることでノッチ付近の隙間を消す
+            document.body.style.backgroundColor = 'transparent';
+            document.documentElement.style.backgroundColor = 'transparent';
             bg.style.background = `url(${val}) center / cover no-repeat fixed`; 
         } else { 
             document.body.style.backgroundColor = val;
@@ -361,18 +364,14 @@
             const lat = pos.coords.latitude; 
             const lng = pos.coords.longitude;
             try {
-                // zoom=18を明示し、addressdetailsをフルで要求
                 const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, { headers: { 'Accept-Language': 'ja' } });
                 const resData = await response.json(); 
                 
                 let addr = "";
                 if (resData.address) {
                     const a = resData.address;
-                    // 日本の住所体系に合わせて詳細なパーツを結合
                     addr = (a.province || "") + (a.city || a.town || a.village || "") + (a.suburb || a.city_district || "") + (a.neighbourhood || "") + (a.road || "") + (a.house_number || "");
-                    // もし名前の付いた建物があれば追加
                     if (resData.display_name && !addr.includes(resData.display_name.split(',')[0])) {
-                         // 詳細パーツが空すぎる場合はdisplay_nameの一部を使用
                          if(addr.length < 5) addr = resData.display_name.split(',').slice(0, 3).reverse().join('').replace(/\s+/g, '');
                     }
                 } else {
