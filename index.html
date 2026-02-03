@@ -55,21 +55,26 @@
             display: none; backdrop-filter: blur(10px); width: 210px; border: 1px solid white; 
         }
 
-        .color-dots { display: flex; gap: 8px; justify-content: center; margin-bottom: 15px; flex-wrap: wrap; }
+        .color-dots { display: flex; gap: 8px; justify-content: center; margin-bottom: 10px; flex-wrap: wrap; }
         .dot { 
             width: 34px; height: 34px; border-radius: 50%; cursor: pointer; 
             border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
         }
         .dot.active-preset { border-color: var(--accent-orange); box-shadow: 0 0 8px var(--accent-orange); }
 
-        /* カスタムカラーと更新ボタンを横並びにするエリア */
-        .custom-color-wrapper { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 15px; }
+        /* ボタンエリアのレイアウト調整：上下2段、各2列で均等配置 */
+        .custom-color-wrapper { display: flex; flex-direction: column; gap: 5px; }
+        .btn-row { display: flex; gap: 5px; width: 100%; }
         
-        /* カラーピッカーのサイズを上のドットと同じ34pxに修正 */
-        .picker-container { width: 34px; height: 34px; overflow: hidden; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative; }
+        /* カラーピッカーを包むボタンとしてのスタイル */
+        .picker-btn { 
+            flex: 1; position: relative; padding: 8px; font-size: 0.75rem; 
+            background: white; border: 1px solid #ddd; border-radius: 10px; 
+            font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
         #color-picker { 
-            position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            cursor: pointer; border: none; padding: 0; background: none;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0; cursor: pointer;
         }
 
         .viewport { display: flex; height: 100%; transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1); }
@@ -122,34 +127,6 @@
             clip-path: polygon(0% 50%, 12.5% 50%, 12.5% 62.5%, 25% 62.5%, 25% 75%, 37.5% 75%, 37.5% 87.5%, 50% 87.5%, 50% 75%, 62.5% 75%, 62.5% 62.5%, 75% 62.5%, 75% 50%, 87.5% 50%, 87.5% 37.5%, 100% 37.5%, 100% 12.5%, 87.5% 12.5%, 87.5% 25%, 75% 25%, 75% 37.5%, 62.5% 37.5%, 62.5% 50%, 50% 50%, 50% 62.5%, 37.5% 62.5%, 37.5% 50%, 25% 50%, 25% 37.5%, 12.5% 37.5%, 12.5% 50%, 0% 50%);
         }
 
-        /* カスタム更新アイコン（ドット調ピクセル矢印に修正） */
-        .reload-icon {
-            width: 20px; height: 20px;
-            background-color: white;
-            /* ピクセル風の回転矢印を描画 */
-            clip-path: polygon(
-                /* 矢印の先端 */
-                40% 0%, 60% 0%, 60% 20%, 80% 20%, 80% 40%, 100% 40%, 100% 70%, 70% 70%, 70% 100%, 30% 100%, 30% 70%, 0% 70%, 0% 40%, 20% 40%, 20% 20%, 40% 20%,
-                /* 穴あけ（ドーナツ状にするためのパス） */
-                40% 20%, 20% 20%, 20% 40%, 0% 40%, 0% 70%, 30% 70%, 30% 100%, 70% 100%, 70% 70%, 100% 70%, 100% 40%, 80% 40%, 80% 20%, 60% 20%, 60% 0%, 40% 0%
-            );
-            /* シンプルなピクセル矢印案 */
-            clip-path: polygon(10% 40%, 40% 40%, 40% 10%, 60% 10%, 60% 40%, 90% 40%, 90% 60%, 60% 60%, 60% 90%, 40% 90%, 40% 60%, 10% 60%);
-            /* より「リロード」らしいドット風アイコン */
-            mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="3" stroke-linecap="square"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>');
-            -webkit-mask: var(--mask);
-            mask: var(--mask);
-            background: white;
-            width: 22px; height: 22px;
-        }
-        
-        /* リロードアイコン（CSS描画のピクセル風） */
-        .pixel-reload {
-            width: 20px; height: 20px;
-            background-color: white;
-            clip-path: polygon(0 40%, 20% 40%, 20% 20%, 40% 20%, 40% 0, 80% 0, 80% 20%, 100% 20%, 100% 60%, 80% 60%, 80% 40%, 40% 40%, 40% 60%, 60% 60%, 60% 100%, 20% 100%, 20% 80%, 0 80%);
-        }
-
         textarea { height: 80px; resize: none; margin-top: 8px; }
         #summary { font-size:0.8rem; text-align:left; background:rgba(0,0,0,0.05); padding:12px; border-radius:10px; overflow-y:auto; flex:1; margin-bottom:5px; line-height:1.5; }
 
@@ -169,18 +146,21 @@
             <div id="p2" class="dot" onpointerup="selectPreset('p2')"></div>
             <div id="p3" class="dot" onpointerup="selectPreset('p3')"></div>
         </div>
+        
         <div class="custom-color-wrapper">
-            <div class="picker-container">
-                <input type="color" id="color-picker" value="#a3c1da" onchange="applyBG(this.value)">
+            <div class="btn-row">
+                <div class="picker-btn">
+                    パレット
+                    <input type="color" id="color-picker" value="#a3c1da" onchange="applyBG(this.value)">
+                </div>
+                <button class="btn-main" style="padding:8px; font-size:0.75rem; margin:0; box-shadow:none; flex:1;" onpointerup="location.reload()">こうしん</button>
             </div>
-            <button class="btn-dot-ok" style="width:34px; height:34px; box-shadow: 0 3px 0 #4a7a66;" onpointerup="location.reload()">
-                <div class="pixel-reload"></div>
-            </button>
-        </div>
-        <input type="file" id="bg-upload" accept="image/*" style="display:none" onchange="uploadBG(this)">
-        <div style="display:flex; gap:5px;">
-            <button class="btn-main" style="padding:8px; font-size:0.75rem; margin:0; box-shadow:none; flex:1;" onpointerup="document.getElementById('bg-upload').click()">画像えらぶ</button>
-            <button id="save-preset-btn" class="btn-main" style="padding:8px; font-size:0.75rem; margin:0; box-shadow:none; flex:1; background:var(--accent-green);" onpointerup="saveToSelectedPreset()">保存する</button>
+            
+            <input type="file" id="bg-upload" accept="image/*" style="display:none" onchange="uploadBG(this)">
+            <div class="btn-row">
+                <button class="btn-main" style="padding:8px; font-size:0.75rem; margin:0; box-shadow:none; flex:1;" onpointerup="document.getElementById('bg-upload').click()">画像えらぶ</button>
+                <button id="save-preset-btn" class="btn-main" style="padding:8px; font-size:0.75rem; margin:0; box-shadow:none; flex:1; background:var(--accent-green);" onpointerup="saveToSelectedPreset()">保存する</button>
+            </div>
         </div>
     </div>
     <button class="bg-btn" onpointerup="toggleBGPanel()">…</button>
