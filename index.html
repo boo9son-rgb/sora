@@ -63,8 +63,7 @@
             border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
             touch-action: none !important; 
         }
-        /* 選択中のドットを強調 */
-        .dot.active-preset { border-color: var(--accent-orange); box-shadow: 0 0 8px var(--accent-orange); }
+        .dot.selected { border: 2px solid var(--accent-orange); box-shadow: 0 0 8px var(--accent-orange); }
 
         .custom-color-wapper { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; font-size: 0.8rem; }
         #color-picker { border: none; width: 30px; height: 30px; cursor: pointer; background: none; }
@@ -149,8 +148,8 @@
         </div>
         <input type="file" id="bg-upload" accept="image/*" style="display:none" onchange="uploadBG(this)">
         <div style="display:flex; gap:5px;">
-            <button class="btn-main" style="padding:8px; font-size:0.75rem; margin:0; box-shadow:none; flex:1;" onpointerup="document.getElementById('bg-upload').click()">画像えらぶ</button>
-            <button id="save-preset-btn" class="btn-main" style="padding:8px; font-size:0.75rem; margin:0; box-shadow:none; flex:1; background:var(--accent-green);" onpointerup="saveToSelectedPreset()">保存する</button>
+            <button class="btn-main" style="padding:8px; font-size:0.75rem; margin:0; box-shadow:none;" onpointerup="document.getElementById('bg-upload').click()">画像えらぶ</button>
+            <button id="save-preset-btn" class="btn-main" style="padding:8px; font-size:0.75rem; margin:0; box-shadow:none; background:var(--accent-green);" onpointerup="saveCurrentToPreset()">保存</button>
         </div>
     </div>
     <button class="bg-btn" onpointerup="toggleBGPanel()">…</button>
@@ -178,18 +177,17 @@
     let q2_selected_chips = [];
     
     let selectedPresetId = null;
-    let currentBGValue = '#a3c1da';
+    let currentBGValue = '';
 
     function toggleBGPanel() { const p = document.getElementById('bg-panel'); p.style.display = (p.style.display === 'block') ? 'none' : 'block'; }
     
     function applyBG(val) { 
         if(!val) return; 
-        currentBGValue = val;
         const bg = document.getElementById('sky-bg'); 
+        currentBGValue = val;
         if (val === 'default') { 
             bg.style.backgroundImage = 'none'; 
             bg.style.backgroundColor = '#a3c1da'; 
-            currentBGValue = '#a3c1da';
         } else if (val.startsWith('data:image')) { 
             bg.style.background = `url(${val}) center / cover no-repeat fixed`; 
         } else { 
@@ -198,56 +196,55 @@
         } 
         localStorage.setItem('sora_bg_v7_solid', val); 
     }
-    
+
     function selectPreset(id) {
-        document.querySelectorAll('.dot').forEach(d => d.classList.remove('active-preset'));
+        document.querySelectorAll('.dot').forEach(d => d.classList.remove('selected'));
         const dot = document.getElementById(id);
-        dot.classList.add('active-preset');
+        dot.classList.add('selected');
         selectedPresetId = id;
         
-        const savedColor = dot.style.backgroundColor;
-        const savedImage = localStorage.getItem('sora_img_preset_v7_' + id);
-        
-        if (savedImage) {
-            applyBG(savedImage);
-        } else if (savedColor) {
-            applyBG(savedColor);
+        const savedValue = localStorage.getItem('sora_preset_v7_' + id);
+        if (savedValue) {
+            applyBG(savedValue);
         }
     }
 
-    function saveToSelectedPreset() {
-        if (!selectedPresetId) return alert("保存先の○をえらんでね！");
+    function saveCurrentToPreset() {
+        if (!selectedPresetId) {
+            alert("保存先のドットをえらんでね！");
+            return;
+        }
+        const bgValue = currentBGValue || '#a3c1da';
         const dot = document.getElementById(selectedPresetId);
         
-        if (currentBGValue.startsWith('data:image')) {
-            dot.style.backgroundImage = `url(${currentBGValue})`;
-            dot.style.backgroundSize = 'cover';
-            localStorage.setItem('sora_img_preset_v7_' + selectedPresetId, currentBGValue);
-            localStorage.removeItem('sora_preset_v7_' + selectedPresetId);
+        if (bgValue.startsWith('data:image')) {
+            dot.style.background = `url(${bgValue}) center / cover no-repeat`;
         } else {
-            dot.style.backgroundImage = 'none';
-            dot.style.backgroundColor = currentBGValue;
-            localStorage.setItem('sora_preset_v7_' + selectedPresetId, currentBGValue);
-            localStorage.removeItem('sora_img_preset_v7_' + selectedPresetId);
+            dot.style.background = 'none';
+            dot.style.backgroundColor = bgValue;
         }
+        
+        localStorage.setItem('sora_preset_v7_' + selectedPresetId, bgValue);
         alert("ここに保存したよ！");
     }
-
+    
     function uploadBG(input) { if (input.files?.[0]) { const reader = new FileReader(); reader.onload = (e) => applyBG(e.target.result); reader.readAsDataURL(input.files[0]); } }
     
     function initSlots() { 
         ['p1', 'p2', 'p3'].forEach(id => { 
-            const savedColor = localStorage.getItem('sora_preset_v7_' + id); 
-            const savedImage = localStorage.getItem('sora_img_preset_v7_' + id);
+            const saved = localStorage.getItem('sora_preset_v7_' + id); 
             const dot = document.getElementById(id);
-            if(savedImage) {
-                dot.style.backgroundImage = `url(${savedImage})`;
-                dot.style.backgroundSize = 'cover';
-            } else if(savedColor) {
-                dot.style.backgroundColor = savedColor; 
+            if(saved) {
+                if (saved.startsWith('data:image')) {
+                    dot.style.background = `url(${saved}) center / cover no-repeat`;
+                } else {
+                    dot.style.backgroundColor = saved; 
+                }
             }
         }); 
-        const savedBG = localStorage.getItem('sora_bg_v7_solid'); if (savedBG) applyBG(savedBG);
+        const savedBG = localStorage.getItem('sora_bg_v7_solid'); 
+        if (savedBG) applyBG(savedBG); else currentBGValue = 'default';
+
         [4, 5].forEach(n => {
             const reel = document.querySelector(`#slot${n} .slot-reel`);
             reel.innerHTML = `<div class="slot-item"></div>` + options[n].map(opt => `<div class="slot-item">${opt}</div>`).join('') + `<div class="slot-item"></div>`;
