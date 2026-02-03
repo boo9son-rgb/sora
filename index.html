@@ -48,8 +48,8 @@
             background-color: transparent; /* body側で制御するため透明に */
         }
 
-        .bg-settings { position: fixed; bottom: 20px; right: 20px; z-index: 10000; }
-        .bg-btn { width: 44px; height: 44px; border: none; background: none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.1s; font-family: inherit; }
+        .bg-settings { position: fixed; bottom: 20px; right: 20px; z-index: 10000; display: flex; align-items: flex-end; gap: 10px; }
+        .bg-btn { width: 44px; height: 44px; border: none; background: none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.1s; font-family: inherit; display: flex; align-items: center; justify-content: center; }
         
         .bg-panel { 
             position: absolute; bottom: 60px; right: 0; background: var(--cloud-white); 
@@ -117,6 +117,21 @@
             width: 16px; height: 16px; background-color: white;
             clip-path: polygon(0% 50%, 12.5% 50%, 12.5% 62.5%, 25% 62.5%, 25% 75%, 37.5% 75%, 37.5% 87.5%, 50% 87.5%, 50% 75%, 62.5% 75%, 62.5% 62.5%, 75% 62.5%, 75% 50%, 87.5% 50%, 87.5% 37.5%, 100% 37.5%, 100% 12.5%, 87.5% 12.5%, 87.5% 25%, 75% 25%, 75% 37.5%, 62.5% 37.5%, 62.5% 50%, 50% 50%, 50% 62.5%, 37.5% 62.5%, 37.5% 50%, 25% 50%, 25% 37.5%, 12.5% 37.5%, 12.5% 50%, 0% 50%);
         }
+
+        .pixel-reload {
+            width: 20px; height: 20px; background-color: white;
+            clip-path: polygon(37.5% 0%, 62.5% 0%, 62.5% 12.5%, 75% 12.5%, 75% 25%, 87.5% 25%, 87.5% 50%, 100% 50%, 100% 37.5%, 87.5% 37.5%, 87.5% 25%, 75% 25%, 75% 12.5%, 62.5% 12.5%, 62.5% 0%, 37.5% 0%, 37.5% 12.5%, 25% 12.5%, 25% 25%, 12.5% 25%, 12.5% 75%, 25% 75%, 25% 87.5%, 37.5% 87.5%, 62.5% 87.5%, 62.5% 75%, 50% 75%, 50% 87.5%, 37.5% 87.5%, 37.5% 75%, 25% 75%, 25% 25%, 37.5% 25%, 37.5% 12.5%, 62.5% 12.5%, 62.5% 25%, 75% 25%, 75% 62.5%, 62.5% 62.5%, 62.5% 75%, 87.5% 75%, 87.5% 62.5%, 75% 62.5%, 75% 50%, 62.5% 50%, 62.5% 62.5%, 50% 62.5%, 50% 50%, 62.5% 50%, 62.5% 37.5%, 87.5% 37.5%, 87.5% 50%, 75% 50%, 75% 62.5%, 62.5% 62.5%, 62.5% 75%, 50% 75%, 50% 87.5%, 37.5% 87.5%, 37.5% 75%, 25% 75%, 25% 87.5%, 62.5% 87.5%, 62.5% 75%, 75% 75%, 75% 62.5%, 87.5% 62.5%, 87.5% 25%, 75% 25%, 75% 12.5%, 62.5% 12.5%, 62.5% 0%);
+            /* 簡易的な回転矢印のドット絵風クリップパス */
+            clip-path: polygon(20% 20%, 80% 20%, 80% 40%, 100% 40%, 100% 0%, 0% 0%, 0% 100%, 100% 100%, 100% 60%, 80% 60%, 80% 80%, 20% 80%);
+        }
+
+        /* 更新ボタン用の円形アイコン */
+        .reload-icon {
+            width: 20px; height: 20px; border: 3px solid white; border-top: 3px solid transparent; border-radius: 50%; position: relative;
+        }
+        .reload-icon::after {
+            content: ''; position: absolute; top: -2px; left: 8px; border-left: 5px solid white; border-top: 4px solid transparent; border-bottom: 4px solid transparent; transform: rotate(30deg);
+        }
         
         textarea { height: 80px; resize: none; margin-top: 8px; }
         #summary { font-size:0.8rem; text-align:left; background:rgba(0,0,0,0.05); padding:12px; border-radius:10px; overflow-y:auto; flex:1; margin-bottom:5px; line-height:1.5; }
@@ -139,8 +154,8 @@
         </div>
         <div class="custom-color-wapper">
             <input type="color" id="color-picker" value="#a3c1da" onchange="applyBG(this.value)">
-            <button class="btn-dot-ok" style="width:30px; height:30px; box-shadow:none;" onpointerup="location.reload()">
-                <div style="font-size:12px; font-weight:bold;">↻</div>
+            <button class="btn-dot-ok" style="width:44px; height:44px; box-shadow: 0 4px 0 #4a7a66;" onpointerup="location.reload()">
+                <div class="reload-icon"></div>
             </button>
         </div>
         <input type="file" id="bg-upload" accept="image/*" style="display:none" onchange="uploadBG(this)">
@@ -188,17 +203,14 @@
         currentBGValue = val;
         const bg = document.getElementById('sky-bg'); 
         
-        // ノッチ対策：bodyとhtmlの背景色も変更する
         if (val === 'default') { 
             document.body.style.backgroundColor = '#a3c1da';
             document.documentElement.style.backgroundColor = '#a3c1da';
             bg.style.backgroundImage = 'none'; 
             currentBGValue = '#a3c1da';
         } else if (val.startsWith('data:image')) { 
-            // 画像の場合はbodyではなくsky-bg要素で表示
             bg.style.background = `url(${val}) center / cover no-repeat fixed`; 
         } else { 
-            // 単色の場合は全体の色を書き換える
             document.body.style.backgroundColor = val;
             document.documentElement.style.backgroundColor = val;
             bg.style.backgroundImage = 'none'; 
