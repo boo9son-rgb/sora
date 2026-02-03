@@ -367,10 +367,30 @@
     }
 
     function finish() {
-        const btn = document.getElementById('btn-finish');
-        btn.innerText = "送信しました！";
-        btn.classList.add('success');
-        console.log("Final Data:", data);
+        const text = `【お出かけプランの相談】
+・だれと：${data.q1}
+・なにを：${data.q2.join('・')}
+・場所：${data.q3}
+・時間：${data.q4}
+・予算：${data.q5}
+・移動：${data.q6}
+・テーマ：${data.q7}
+・こだわり：${data.q8}
+・NG：${data.q9}
+
+この条件に合うおすすめのプランをいくつか提案して！`;
+
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = document.getElementById('btn-finish');
+            btn.innerText = "コピー完了！Geminiへ...";
+            btn.classList.add('success');
+            
+            setTimeout(() => {
+                window.location.href = "https://gemini.google.com/";
+            }, 800);
+        }).catch(err => {
+            alert("コピーに失敗しました。手動でコピーしてください。");
+        });
     }
 
     initSlots();
