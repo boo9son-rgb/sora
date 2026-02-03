@@ -337,21 +337,45 @@
 
     async function getPreciseLocation(n) {
         if (!navigator.geolocation) return alert("GPSが使えません");
-        const btn = document.getElementById('gps-btn'); btn.innerText = "取得中...";
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-            const lat = pos.coords.latitude; const lng = pos.coords.longitude;
+        const btn = document.getElementById('gps-btn'); 
+        btn.innerText = "精度向上中...";
+        
+        let bestPos = null;
+        let count = 0;
+
+        // 高精度な位置が確定するまで最大3秒間ウォッチする
+        const watchId = navigator.geolocation.watchPosition((pos) => {
+            count++;
+            if (!bestPos || pos.coords.accuracy < bestPos.coords.accuracy) {
+                bestPos = pos;
+            }
+            // 精度が20メートル以下になるか、3回以上計測したら確定
+            if (pos.coords.accuracy < 20 || count > 3) finalize(bestPos);
+        }, () => {}, { enableHighAccuracy: true, timeout: 5000 });
+
+        // 最大3.5秒で強制的に確定
+        const timerId = setTimeout(() => finalize(bestPos), 3500);
+
+        async function finalize(pos) {
+            navigator.geolocation.clearWatch(watchId);
+            clearTimeout(timerId);
+            if (!pos) { btn.innerText = "失敗"; return; }
+
+            const lat = pos.coords.latitude; 
+            const lng = pos.coords.longitude;
             try {
                 const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, { headers: { 'Accept-Language': 'ja' } });
                 const resData = await response.json(); 
                 let addr = resData.address ? `${resData.address.province || ""}${resData.address.city || ""}${resData.address.suburb || ""}${resData.address.road || ""}${resData.address.house_number || ""}` : `${lat},${lng}`;
-                // 指定の表記「現在地(住所)」に変更
                 data[`q${n}`] = `現在地(${addr})`; 
-                btn.innerText = "完了！"; setTimeout(next, ACTION_DELAY + 200);
+                btn.innerText = "完了！"; 
+                setTimeout(next, ACTION_DELAY + 200);
             } catch (e) { 
                 data[`q${n}`] = `現在地(${lat},${lng})`; 
-                btn.innerText = "座標で完了"; setTimeout(next, ACTION_DELAY + 200); 
+                btn.innerText = "座標で完了"; 
+                setTimeout(next, ACTION_DELAY + 200); 
             }
-        }, () => { alert("取得失敗"); btn.innerText = "現在地"; }, { enableHighAccuracy: true });
+        }
     }
 
     function openMap(n) { window.open("https://www.google.com/maps", "_blank"); }
