@@ -254,21 +254,21 @@
 
     function initParticles() {
         particles = [];
-        const count = effectType === 'rain' ? 35 : 4; // 雨を少し減らして優しく
+        const count = effectType === 'rain' ? 35 : 4; 
         for (let i = 0; i < count; i++) {
             if (effectType === 'rain') {
                 particles.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
-                    l: Math.random() * 12 + 6, // 少し短めに
-                    v: Math.random() * 4 + 6   // スピードを抑えめに
+                    l: Math.random() * 15 + 10, // 存在感を出すため少し長く
+                    v: Math.random() * 4 + 7    // スピードも微増
                 });
             } else {
                 particles.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * (canvas.height * 0.35),
-                    s: Math.random() * 0.3 + 0.1,
-                    w: Math.random() * 50 + 60 // 雲の基本サイズ
+                    s: Math.random() * 0.3 + 0.15,
+                    w: Math.random() * 50 + 70 
                 });
             }
         }
@@ -281,9 +281,9 @@
         if (effectType === 'rain') {
             ctx.lineWidth = 1.5;
             particles.forEach(p => {
-                ctx.strokeStyle = 'rgba(0,0,0,0.15)'; // 優しい影
+                ctx.strokeStyle = 'rgba(0,0,0,0.25)'; // 影を少し強めに
                 ctx.beginPath(); ctx.moveTo(p.x+1, p.y+1); ctx.lineTo(p.x+1, p.y + p.l + 1); ctx.stroke();
-                ctx.strokeStyle = 'rgba(255,255,255,0.6)'; // 優しい白
+                ctx.strokeStyle = 'rgba(255,255,255,0.7)'; // 白の透明度を上げ存在感を出す
                 ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x, p.y + p.l); ctx.stroke();
                 p.y += p.v;
                 if (p.y > canvas.height) { p.y = -p.l; p.x = Math.random() * canvas.width; }
@@ -291,18 +291,22 @@
         } else {
             particles.forEach(p => {
                 const drawMokoCloud = (x, y, baseW) => {
-                    const h = baseW * 0.5;
-                    // 影の描画
-                    ctx.fillStyle = 'rgba(0,0,0,0.12)';
-                    ctx.fillRect(x+2, y+2, baseW, h*0.7); 
-                    ctx.fillRect(x+baseW*0.15+2, y-h*0.3+2, baseW*0.7, h);
-                    ctx.fillRect(x+baseW*0.3+2, y-h*0.5+2, baseW*0.4, h*0.5);
+                    const h = baseW * 0.6;
+                    // より濃い影
+                    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+                    const sx = x + 2.5, sy = y + 2.5;
+                    ctx.fillRect(sx, sy, baseW, h*0.5); 
+                    ctx.fillRect(sx+baseW*0.1, sy-h*0.2, baseW*0.4, h*0.4);
+                    ctx.fillRect(sx+baseW*0.3, sy-h*0.4, baseW*0.5, h*0.6);
+                    ctx.fillRect(sx+baseW*0.6, sy-h*0.1, baseW*0.3, h*0.3);
                     
-                    // 本体の描画
+                    // モコモコ本体（複数ブロックの組み合わせ）
                     ctx.fillStyle = 'white';
-                    ctx.fillRect(x, y, baseW, h*0.7); // 土台
-                    ctx.fillRect(x+baseW*0.15, y-h*0.3, baseW*0.7, h); // 中段
-                    ctx.fillRect(x+baseW*0.3, y-h*0.5, baseW*0.4, h*0.5); // 頂点
+                    ctx.fillRect(x, y, baseW, h*0.5); // 基盤
+                    ctx.fillRect(x+baseW*0.1, y-h*0.2, baseW*0.4, h*0.4); // 左盛り上がり
+                    ctx.fillRect(x+baseW*0.3, y-h*0.4, baseW*0.5, h*0.6); // 中央メイン
+                    ctx.fillRect(x+baseW*0.6, y-h*0.1, baseW*0.3, h*0.3); // 右端の丸み
+                    ctx.fillRect(x+baseW*0.2, y+h*0.2, baseW*0.6, h*0.3); // 下部の厚み
                 };
                 drawMokoCloud(p.x, p.y, p.w);
                 p.x += p.s;
