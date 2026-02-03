@@ -314,7 +314,10 @@
         );
     }
 
-    function openMap(n) { alert("地図機能は現在準備中です。"); }
+    function openMap(n) {
+        // 直接Googleマップのウェブサイト/アプリURLを開く
+        window.open("https://www.google.com/maps", "_blank");
+    }
 
     function finish() {
         const text = `【注文票】
