@@ -77,6 +77,15 @@
         }
         .btn-panel-item:active { transform: translateY(4px); box-shadow: 0 0 0 #ccc; }
 
+        /* 背景パネル内ボタンの紺色スタイル設定 */
+        .btn-panel-dark {
+            background: var(--text-dark) !important;
+            color: white !important;
+            border-color: transparent !important;
+            box-shadow: 0 4px 0 #222 !important;
+        }
+        .btn-panel-dark:active { box-shadow: 0 0 0 #222 !important; }
+
         .picker-btn { position: relative; overflow: hidden; }
         #color-picker { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -154,15 +163,15 @@
         
         <div class="custom-color-wrapper">
             <div class="btn-row">
-                <div class="btn-panel-item picker-btn">
+                <div class="btn-panel-item picker-btn btn-panel-dark">
                     パレット
                     <input type="color" id="color-picker" value="#a3c1da" onchange="applyBG(this.value)">
                 </div>
-                <div class="btn-panel-item" onpointerup="location.reload()">こうしん</div>
+                <div class="btn-panel-item btn-panel-dark" onpointerup="location.reload()">こうしん</div>
             </div>
             <input type="file" id="bg-upload" accept="image/*" style="display:none" onchange="uploadBG(this)">
             <div class="btn-row">
-                <div class="btn-panel-item" onpointerup="document.getElementById('bg-upload').click()">画像えらぶ</div>
+                <div class="btn-panel-item btn-panel-dark" onpointerup="document.getElementById('bg-upload').click()">画像えらぶ</div>
                 <div id="save-preset-btn" class="btn-panel-item" style="background:var(--accent-green); color:white; border-color:transparent; box-shadow:0 4px 0 #4a7a66;" onpointerup="saveToSelectedPreset()">保存する</div>
             </div>
         </div>
@@ -311,7 +320,7 @@
                 <b>■時間：</b>${data.q4}<br>
                 <b>■予算：</b>${data.q5}<br>
                 <b>■移動：</b>${data.q6}<br>
-                <b>■時間：</b>${data.q7}<br>
+                <b>■テーマ：</b>${data.q7}<br>
                 <b>■こだわり：</b>${data.q8}<br>
                 <b>■NG条件：</b>${data.q9}
             `; 
