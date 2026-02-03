@@ -77,7 +77,6 @@
         }
         .btn-panel-item:active { transform: translateY(4px); box-shadow: 0 0 0 #ccc; }
 
-        /* 背景パネル内ボタンの紺色スタイル設定 */
         .btn-panel-dark {
             background: var(--text-dark) !important;
             color: white !important;
@@ -150,7 +149,7 @@
 <body oncontextmenu="return false;">
 
 <button class="btn-back" id="btn-back" onpointerup="prev()">＜</button>
-<div class="sky-bg" id="sky-bg"></div>
+<div class="sky-bg" id="sky-bg" onpointerup="closeBGPanel()"></div>
 
 <div class="bg-settings">
     <div class="bg-panel" id="bg-panel">
@@ -176,7 +175,7 @@
             </div>
         </div>
     </div>
-    <button class="bg-btn" onpointerup="toggleBGPanel()">…</button>
+    <button class="bg-btn" onpointerup="toggleBGPanel(event)">…</button>
 </div>
 
 <div class="viewport" id="viewport">
@@ -209,8 +208,17 @@
     let currentBGValue = '#a3c1da';
     const ACTION_DELAY = 250; 
 
-    function toggleBGPanel() { const p = document.getElementById('bg-panel'); p.style.display = (p.style.display === 'block') ? 'none' : 'block'; }
+    function toggleBGPanel(e) { 
+        if(e) e.stopPropagation(); 
+        const p = document.getElementById('bg-panel'); 
+        p.style.display = (p.style.display === 'block') ? 'none' : 'block'; 
+    }
     
+    function closeBGPanel() {
+        const p = document.getElementById('bg-panel');
+        if (p.style.display === 'block') p.style.display = 'none';
+    }
+
     function applyBG(val) { 
         if(!val) return; 
         currentBGValue = val;
