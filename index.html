@@ -168,7 +168,7 @@
     let step = 0;
     let startY = 0, moveY = 0; 
     const data = { q1:'', q2:[], q3:'', q4:'', q5:'', q6:'', q7:'', q8:'', q9:'' };
-    const options = { 4: ['今すぐ', '15分後', '30分後', '1時間後'], 5: ['特になし', '～1000円', '～2000円', '～3000円', '～5000円'] };
+    const options = { 4: ['今すぐ', '15分後', '30分後', '1時間後'], 5: ['特になし', '～1000円', '～2000円', '～3000円', '～5000円', '～10000円', '上限なし'] };
     const slotState = { 4: 0, 5: 0 };
     let q2_selected_chips = [];
     
@@ -313,7 +313,6 @@
                         const pref = a.province || a.state || "";
                         const city = a.city || a.ward || a.town || a.village || "";
                         const district = a.suburb || a.neighbourhood || "";
-                        // 日本の住所体系に合わせて連結 (町名 + 番地 + 建物名など)
                         const road = a.road || "";
                         const houseNumber = a.house_number || "";
                         const building = a.amenity || a.building || "";
