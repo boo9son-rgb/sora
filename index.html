@@ -198,7 +198,7 @@
     let q2_selected_chips = [];
     let selectedPresetId = null;
     let currentBGValue = '#a3c1da';
-    const ACTION_DELAY = 250; // 心地よい押し込みのための絶妙な待ち時間
+    const ACTION_DELAY = 250; 
 
     function toggleBGPanel() { const p = document.getElementById('bg-panel'); p.style.display = (p.style.display === 'block') ? 'none' : 'block'; }
     
@@ -275,7 +275,22 @@
     
     function quickSave(n, val) { data[`q${n}`] = val; setTimeout(next, ACTION_DELAY); }
     function save(n, val) { if(!val) return alert("入力してね！"); data[`q${n}`] = val; setTimeout(next, ACTION_DELAY); }
-    function saveSlot(n) { let val = document.getElementById(`q${n}_free`)?.value || options[n][slotState[n]]; if (n === 4) { const now = new Date(); val = `${val}(現時刻:${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')})`; } data[`q${n}`] = val; setTimeout(next, ACTION_DELAY); }
+
+    function saveSlot(n) { 
+        let val = document.getElementById(`q${n}_free`)?.value || options[n][slotState[n]]; 
+        if (n === 4) { 
+            const now = new Date(); 
+            const y = now.getFullYear();
+            const m = now.getMonth() + 1;
+            const d = now.getDate();
+            const hh = now.getHours().toString().padStart(2, '0'); 
+            const mm = now.getMinutes().toString().padStart(2, '0'); 
+            val = `${val}(現在時刻:${y}/${m}/${d} ${hh}:${mm})`; 
+        } 
+        data[`q${n}`] = val; 
+        setTimeout(next, ACTION_DELAY); 
+    }
+
     function toggleItem(el, val) { el.classList.toggle('selected'); const idx = q2_selected_chips.indexOf(val); if (idx > -1) q2_selected_chips.splice(idx, 1); else q2_selected_chips.push(val); }
     function nextMulti() { const free = document.getElementById('q2_free').value; data.q2 = [...q2_selected_chips]; if(free) data.q2.push(free); if(!data.q2.length) return alert("なにか選んでね！"); setTimeout(next, ACTION_DELAY); }
     function delayedNext() { setTimeout(next, ACTION_DELAY); }
@@ -296,7 +311,7 @@
                 <b>■時間：</b>${data.q4}<br>
                 <b>■予算：</b>${data.q5}<br>
                 <b>■移動：</b>${data.q6}<br>
-                <b>■テーマ：</b>${data.q7}<br>
+                <b>■時間：</b>${data.q7}<br>
                 <b>■こだわり：</b>${data.q8}<br>
                 <b>■NG条件：</b>${data.q9}
             `; 
