@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>SORA - Pixel Sky Hybrid</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
@@ -16,24 +18,25 @@
             --shadow: 0 8px 30px rgba(0,0,0,0.12);
         }
 
-        /* 画面全体のスクロールとバウンスを徹底防止 */
         * { 
             -webkit-tap-highlight-color: transparent; 
             touch-action: pan-x pan-y;
         }
 
+        /* html/body全体に背景色を同期させる */
         body, html { 
             margin: 0; padding: 0; 
             height: 100%; width: 100%;
-            height: 100dvh; /* iPhoneのツールバー対策 */
+            height: 100dvh;
             font-family: 'DotGothic16', sans-serif; 
             color: var(--text-dark); 
             overflow: hidden; 
-            position: fixed; /* 画面を固定 */
-            overscroll-behavior: none; /* バウンス防止 */
+            position: fixed;
+            overscroll-behavior: none;
+            /* 初期の背景色 */
+            background-color: var(--sky-blue);
         }
 
-        /* 入力エリアだけは操作を許可 */
         input, textarea { 
             -webkit-user-select: text !important; 
             user-select: text !important; 
@@ -41,8 +44,8 @@
 
         .sky-bg { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background-color: var(--sky-blue); 
             z-index: -1; 
+            background-color: transparent; /* body側で制御するため透明に */
         }
 
         .bg-settings { position: fixed; bottom: 20px; right: 20px; z-index: 10000; }
@@ -72,6 +75,8 @@
             border-radius: 20px; padding: 20px; width: 100%; max-width: 320px; 
             text-align: center; box-shadow: var(--shadow); border: 1px solid rgba(255, 255, 255, 0.6); 
             height: 360px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;
+            /* ノッチを避けるために少し下にマージンを持つ場合 */
+            margin-top: env(safe-area-inset-top);
         }
 
         h2 { font-size: 1.0rem; margin-top: 0; margin-bottom: 10px; }
@@ -158,7 +163,6 @@
 </div>
 
 <script>
-    // 画面の引っ張り更新やスクロールをJavaScript側でも防止
     document.addEventListener('touchmove', function(e) {
         if (!e.target.closest('.inventory-grid') && !e.target.closest('textarea') && !e.target.closest('#summary')) {
             e.preventDefault();
@@ -180,15 +184,21 @@
         if(!val) return; 
         currentBGValue = val;
         const bg = document.getElementById('sky-bg'); 
+        
+        // ノッチ対策：bodyとhtmlの背景色も変更する
         if (val === 'default') { 
+            document.body.style.backgroundColor = '#a3c1da';
+            document.documentElement.style.backgroundColor = '#a3c1da';
             bg.style.backgroundImage = 'none'; 
-            bg.style.backgroundColor = '#a3c1da'; 
             currentBGValue = '#a3c1da';
         } else if (val.startsWith('data:image')) { 
+            // 画像の場合はbodyではなくsky-bg要素で表示
             bg.style.background = `url(${val}) center / cover no-repeat fixed`; 
         } else { 
+            // 単色の場合は全体の色を書き換える
+            document.body.style.backgroundColor = val;
+            document.documentElement.style.backgroundColor = val;
             bg.style.backgroundImage = 'none'; 
-            bg.style.backgroundColor = val; 
         } 
         localStorage.setItem('sora_bg_v7_solid', val); 
     }
@@ -230,7 +240,9 @@
             if(savedImage) { dot.style.backgroundImage = `url(${savedImage})`; dot.style.backgroundSize = 'cover'; }
             else if(savedColor) { dot.style.backgroundColor = savedColor; }
         }); 
-        const savedBG = localStorage.getItem('sora_bg_v7_solid'); if (savedBG) applyBG(savedBG);
+        const savedBG = localStorage.getItem('sora_bg_v7_solid'); 
+        if (savedBG) applyBG(savedBG); else applyBG('default');
+
         [4, 5].forEach(n => {
             const reel = document.querySelector(`#slot${n} .slot-reel`);
             reel.innerHTML = `<div class="slot-item"></div>` + options[n].map(opt => `<div class="slot-item">${opt}</div>`).join('') + `<div class="slot-item"></div>`;
