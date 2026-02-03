@@ -367,7 +367,7 @@
     }
 
     function finish() {
-        const text = `【お出かけプランの相談】
+        const text = `【注文票】
 ・だれと：${data.q1}
 ・なにを：${data.q2.join('・')}
 ・場所：${data.q3}
@@ -376,9 +376,7 @@
 ・移動：${data.q6}
 ・テーマ：${data.q7}
 ・こだわり：${data.q8}
-・NG：${data.q9}
-
-この条件に合うおすすめのプランをいくつか提案して！`;
+・NG：${data.q9}`;
 
         navigator.clipboard.writeText(text).then(() => {
             const btn = document.getElementById('btn-finish');
