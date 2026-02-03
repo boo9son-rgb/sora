@@ -62,16 +62,19 @@
         }
         .dot.active-preset { border-color: var(--accent-orange); box-shadow: 0 0 8px var(--accent-orange); }
 
-        /* ボタンエリアのレイアウト調整：上下2段、各2列で均等配置 */
-        .custom-color-wrapper { display: flex; flex-direction: column; gap: 5px; }
+        .custom-color-wrapper { display: flex; flex-direction: column; gap: 8px; }
         .btn-row { display: flex; gap: 5px; width: 100%; }
         
-        /* カラーピッカーを包むボタンとしてのスタイル */
-        .picker-btn { 
-            flex: 1; position: relative; padding: 8px; font-size: 0.75rem; 
-            background: white; border: 1px solid #ddd; border-radius: 10px; 
-            font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        /* 均等配置用のボタンベーススタイル */
+        .btn-panel-item { 
+            flex: 1; padding: 8px; font-size: 0.75rem; border-radius: 10px; 
+            font-family: inherit; cursor: pointer; display: flex; align-items: center; 
+            justify-content: center; position: relative; border: 1px solid #ddd;
+            box-shadow: 0 4px 0 #ccc; background: white; transition: none;
         }
+        .btn-panel-item:active { transform: translateY(4px); box-shadow: 0 0 0 #ccc; }
+
+        .picker-btn { position: relative; overflow: hidden; }
         #color-picker { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             opacity: 0; cursor: pointer;
@@ -121,6 +124,7 @@
             box-shadow: 0 4px 0 #4a7a66; cursor: pointer; display: flex; 
             align-items: center; justify-content: center; flex-shrink: 0;
         }
+        .btn-dot-ok:active { transform: translateY(4px); box-shadow: 0 0 0 #4a7a66; }
         
         .pixel-check {
             width: 16px; height: 16px; background-color: white;
@@ -149,17 +153,17 @@
         
         <div class="custom-color-wrapper">
             <div class="btn-row">
-                <div class="picker-btn">
+                <div class="btn-panel-item picker-btn">
                     パレット
                     <input type="color" id="color-picker" value="#a3c1da" onchange="applyBG(this.value)">
                 </div>
-                <button class="btn-main" style="padding:8px; font-size:0.75rem; margin:0; box-shadow:none; flex:1;" onpointerup="location.reload()">こうしん</button>
+                <div class="btn-panel-item" onpointerup="location.reload()">こうしん</div>
             </div>
             
             <input type="file" id="bg-upload" accept="image/*" style="display:none" onchange="uploadBG(this)">
             <div class="btn-row">
-                <button class="btn-main" style="padding:8px; font-size:0.75rem; margin:0; box-shadow:none; flex:1;" onpointerup="document.getElementById('bg-upload').click()">画像えらぶ</button>
-                <button id="save-preset-btn" class="btn-main" style="padding:8px; font-size:0.75rem; margin:0; box-shadow:none; flex:1; background:var(--accent-green);" onpointerup="saveToSelectedPreset()">保存する</button>
+                <div class="btn-panel-item" onpointerup="document.getElementById('bg-upload').click()">画像えらぶ</div>
+                <div id="save-preset-btn" class="btn-panel-item" style="background:var(--accent-green); color:white; border-color:transparent; box-shadow:0 4px 0 #4a7a66;" onpointerup="saveToSelectedPreset()">保存する</div>
             </div>
         </div>
     </div>
