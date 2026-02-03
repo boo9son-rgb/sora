@@ -210,7 +210,7 @@
         if (currentBGValue.startsWith('data:image')) {
             dot.style.backgroundImage = `url(${currentBGValue})`;
             dot.style.backgroundSize = 'cover';
-            localStorage.setItem('sora_img_preset_v7_') + selectedPresetId, currentBGValue;
+            localStorage.setItem('sora_img_preset_v7_' + selectedPresetId, currentBGValue);
             localStorage.removeItem('sora_preset_v7_' + selectedPresetId);
         } else {
             dot.style.backgroundImage = 'none';
@@ -298,25 +298,32 @@
         if (!navigator.geolocation) return alert("GPSが使えないようです");
         const btn = document.getElementById('gps-btn');
         btn.innerText = "取得中...";
+        
         navigator.geolocation.getCurrentPosition(
             async (pos) => {
                 const lat = pos.coords.latitude; const lng = pos.coords.longitude;
                 try {
-                    // 精度向上のためNominatimに詳細リクエスト
+                    // 精度向上のためNominatimにリクエスト
                     const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, { headers: { 'Accept-Language': 'ja' } });
                     const resData = await response.json(); 
                     const a = resData.address;
                     let addr = "";
+                    
                     if (a) {
                         const postCode = a.postcode ? `〒${a.postcode} ` : "";
                         const pref = a.province || a.state || "";
                         const city = a.city || a.ward || a.town || a.village || "";
                         const district = a.suburb || a.neighbourhood || "";
                         const road = a.road || "";
+                        // 番地情報 (house_number) を優先、なければ road 以降を結合
                         const houseNumber = a.house_number || "";
+                        
                         addr = postCode + pref + city + district + road + houseNumber;
                     }
+                    
+                    // それでも短すぎる場合はフルネームを使用
                     if (!addr || addr.length < 5) addr = resData.display_name || `現在地 (${lat}, ${lng})`;
+                    
                     data[`q${n}`] = addr; 
                     btn.innerText = "取得完了！"; 
                     setTimeout(next, 500);
@@ -326,7 +333,7 @@
                     setTimeout(next, 500); 
                 }
             },
-            (err) => { alert("位置情報が取得できませんでした。設定を確認してね。"); btn.innerText = "現在地"; },
+            (err) => { alert("位置情報が取得できませんでした。"); btn.innerText = "現在地"; },
             { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
     }
