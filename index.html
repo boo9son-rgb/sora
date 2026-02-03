@@ -121,7 +121,7 @@
         .slot-item.active { color: var(--text-dark); font-weight: bold; font-size: 1.1rem; }
         .slot-overlay { position: absolute; top: 40px; left: 0; width: 100%; height: 40px; pointer-events: none; border-top: 1px solid rgba(0,0,0,0.1); border-bottom: 1px solid rgba(0,0,0,0.1); background: rgba(0, 0, 0, 0.03); }
 
-        .btn-main { width: 100%; margin-top: 10px; padding: 12px; background: var(--text-dark); color: white; border: none; border-radius: 10px; font-family: inherit; font-size: 0.9rem; box-shadow: 0 4px 0 #222; cursor: pointer; position: relative; transition: transform 0.05s; }
+        .btn-main { width: 100%; margin-top: 10px; padding: 12px; background: var(--text-dark) ; color: white; border: none; border-radius: 10px; font-family: inherit; font-size: 0.9rem; box-shadow: 0 4px 0 #222; cursor: pointer; position: relative; transition: transform 0.05s; }
         .btn-main:active { transform: translateY(4px); box-shadow: 0 0 0 #222; }
 
         .free-input-wrapper { display: flex; gap: 8px; width: 100%; margin-top: 8px; }
@@ -338,40 +338,52 @@
     async function getPreciseLocation(n) {
         if (!navigator.geolocation) return alert("GPSが使えません");
         const btn = document.getElementById('gps-btn'); 
-        btn.innerText = "精度向上中...";
+        btn.innerText = "住所を解析中...";
         
         let bestPos = null;
         let count = 0;
 
-        // 高精度な位置が確定するまで最大3秒間ウォッチする
         const watchId = navigator.geolocation.watchPosition((pos) => {
             count++;
             if (!bestPos || pos.coords.accuracy < bestPos.coords.accuracy) {
                 bestPos = pos;
             }
-            // 精度が20メートル以下になるか、3回以上計測したら確定
-            if (pos.coords.accuracy < 20 || count > 3) finalize(bestPos);
-        }, () => {}, { enableHighAccuracy: true, timeout: 5000 });
+            if (pos.coords.accuracy < 15 || count > 4) finalize(bestPos);
+        }, () => {}, { enableHighAccuracy: true, timeout: 6000 });
 
-        // 最大3.5秒で強制的に確定
-        const timerId = setTimeout(() => finalize(bestPos), 3500);
+        const timerId = setTimeout(() => finalize(bestPos), 4500);
 
         async function finalize(pos) {
             navigator.geolocation.clearWatch(watchId);
             clearTimeout(timerId);
-            if (!pos) { btn.innerText = "失敗"; return; }
+            if (!pos) { btn.innerText = "再試行してね"; return; }
 
             const lat = pos.coords.latitude; 
             const lng = pos.coords.longitude;
             try {
+                // zoom=18を明示し、addressdetailsをフルで要求
                 const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, { headers: { 'Accept-Language': 'ja' } });
                 const resData = await response.json(); 
-                let addr = resData.address ? `${resData.address.province || ""}${resData.address.city || ""}${resData.address.suburb || ""}${resData.address.road || ""}${resData.address.house_number || ""}` : `${lat},${lng}`;
+                
+                let addr = "";
+                if (resData.address) {
+                    const a = resData.address;
+                    // 日本の住所体系に合わせて詳細なパーツを結合
+                    addr = (a.province || "") + (a.city || a.town || a.village || "") + (a.suburb || a.city_district || "") + (a.neighbourhood || "") + (a.road || "") + (a.house_number || "");
+                    // もし名前の付いた建物があれば追加
+                    if (resData.display_name && !addr.includes(resData.display_name.split(',')[0])) {
+                         // 詳細パーツが空すぎる場合はdisplay_nameの一部を使用
+                         if(addr.length < 5) addr = resData.display_name.split(',').slice(0, 3).reverse().join('').replace(/\s+/g, '');
+                    }
+                } else {
+                    addr = `${lat.toFixed(4)},${lng.toFixed(4)}`;
+                }
+
                 data[`q${n}`] = `現在地(${addr})`; 
                 btn.innerText = "完了！"; 
                 setTimeout(next, ACTION_DELAY + 200);
             } catch (e) { 
-                data[`q${n}`] = `現在地(${lat},${lng})`; 
+                data[`q${n}`] = `現在地(${lat.toFixed(4)},${lng.toFixed(4)})`; 
                 btn.innerText = "座標で完了"; 
                 setTimeout(next, ACTION_DELAY + 200); 
             }
