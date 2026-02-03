@@ -23,7 +23,6 @@
             touch-action: pan-x pan-y;
         }
 
-        /* html/body全体に背景色を同期させる */
         body, html { 
             margin: 0; padding: 0; 
             height: 100%; width: 100%;
@@ -33,7 +32,6 @@
             overflow: hidden; 
             position: fixed;
             overscroll-behavior: none;
-            /* 初期の背景色 */
             background-color: var(--sky-blue);
         }
 
@@ -45,10 +43,10 @@
         .sky-bg { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             z-index: -1; 
-            background-color: transparent; /* body側で制御するため透明に */
+            background-color: transparent;
         }
 
-        .bg-settings { position: fixed; bottom: 20px; right: 20px; z-index: 10000; display: flex; align-items: flex-end; gap: 10px; }
+        .bg-settings { position: fixed; bottom: 20px; right: 20px; z-index: 10000; }
         .bg-btn { width: 44px; height: 44px; border: none; background: none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.1s; font-family: inherit; display: flex; align-items: center; justify-content: center; }
         
         .bg-panel { 
@@ -57,15 +55,22 @@
             display: none; backdrop-filter: blur(10px); width: 210px; border: 1px solid white; 
         }
 
-        .color-dots { display: flex; gap: 8px; justify-content: center; margin-bottom: 5px; flex-wrap: wrap; }
+        .color-dots { display: flex; gap: 8px; justify-content: center; margin-bottom: 15px; flex-wrap: wrap; }
         .dot { 
             width: 34px; height: 34px; border-radius: 50%; cursor: pointer; 
             border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
         }
         .dot.active-preset { border-color: var(--accent-orange); box-shadow: 0 0 8px var(--accent-orange); }
 
-        .custom-color-wapper { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; font-size: 0.8rem; }
-        #color-picker { border: none; width: 30px; height: 30px; cursor: pointer; background: none; }
+        /* カスタムカラーと更新ボタンを横並びにするエリア */
+        .custom-color-wrapper { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 15px; }
+        
+        /* カラーピッカーのコンテナを44pxに固定 */
+        .picker-container { width: 44px; height: 44px; overflow: hidden; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative; }
+        #color-picker { 
+            position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            cursor: pointer; border: none; padding: 0; background: none;
+        }
 
         .viewport { display: flex; height: 100%; transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1); }
         .card { min-width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; }
@@ -75,7 +80,6 @@
             border-radius: 20px; padding: 20px; width: 100%; max-width: 320px; 
             text-align: center; box-shadow: var(--shadow); border: 1px solid rgba(255, 255, 255, 0.6); 
             height: 360px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;
-            /* ノッチを避けるために少し下にマージンを持つ場合 */
             margin-top: env(safe-area-inset-top);
         }
 
@@ -118,19 +122,12 @@
             clip-path: polygon(0% 50%, 12.5% 50%, 12.5% 62.5%, 25% 62.5%, 25% 75%, 37.5% 75%, 37.5% 87.5%, 50% 87.5%, 50% 75%, 62.5% 75%, 62.5% 62.5%, 75% 62.5%, 75% 50%, 87.5% 50%, 87.5% 37.5%, 100% 37.5%, 100% 12.5%, 87.5% 12.5%, 87.5% 25%, 75% 25%, 75% 37.5%, 62.5% 37.5%, 62.5% 50%, 50% 50%, 50% 62.5%, 37.5% 62.5%, 37.5% 50%, 25% 50%, 25% 37.5%, 12.5% 37.5%, 12.5% 50%, 0% 50%);
         }
 
-        .pixel-reload {
-            width: 20px; height: 20px; background-color: white;
-            clip-path: polygon(37.5% 0%, 62.5% 0%, 62.5% 12.5%, 75% 12.5%, 75% 25%, 87.5% 25%, 87.5% 50%, 100% 50%, 100% 37.5%, 87.5% 37.5%, 87.5% 25%, 75% 25%, 75% 12.5%, 62.5% 12.5%, 62.5% 0%, 37.5% 0%, 37.5% 12.5%, 25% 12.5%, 25% 25%, 12.5% 25%, 12.5% 75%, 25% 75%, 25% 87.5%, 37.5% 87.5%, 62.5% 87.5%, 62.5% 75%, 50% 75%, 50% 87.5%, 37.5% 87.5%, 37.5% 75%, 25% 75%, 25% 25%, 37.5% 25%, 37.5% 12.5%, 62.5% 12.5%, 62.5% 25%, 75% 25%, 75% 62.5%, 62.5% 62.5%, 62.5% 75%, 87.5% 75%, 87.5% 62.5%, 75% 62.5%, 75% 50%, 62.5% 50%, 62.5% 62.5%, 50% 62.5%, 50% 50%, 62.5% 50%, 62.5% 37.5%, 87.5% 37.5%, 87.5% 50%, 75% 50%, 75% 62.5%, 62.5% 62.5%, 62.5% 75%, 50% 75%, 50% 87.5%, 37.5% 87.5%, 37.5% 75%, 25% 75%, 25% 87.5%, 62.5% 87.5%, 62.5% 75%, 75% 75%, 75% 62.5%, 87.5% 62.5%, 87.5% 25%, 75% 25%, 75% 12.5%, 62.5% 12.5%, 62.5% 0%);
-            /* 簡易的な回転矢印のドット絵風クリップパス */
-            clip-path: polygon(20% 20%, 80% 20%, 80% 40%, 100% 40%, 100% 0%, 0% 0%, 0% 100%, 100% 100%, 100% 60%, 80% 60%, 80% 80%, 20% 80%);
-        }
-
-        /* 更新ボタン用の円形アイコン */
+        /* カスタム更新アイコン */
         .reload-icon {
-            width: 20px; height: 20px; border: 3px solid white; border-top: 3px solid transparent; border-radius: 50%; position: relative;
+            width: 22px; height: 22px; border: 3px solid white; border-top: 3px solid transparent; border-radius: 50%; position: relative; transform: rotate(45deg);
         }
         .reload-icon::after {
-            content: ''; position: absolute; top: -2px; left: 8px; border-left: 5px solid white; border-top: 4px solid transparent; border-bottom: 4px solid transparent; transform: rotate(30deg);
+            content: ''; position: absolute; top: -4px; left: 8px; border-left: 6px solid white; border-top: 5px solid transparent; border-bottom: 5px solid transparent; transform: rotate(10deg);
         }
         
         textarea { height: 80px; resize: none; margin-top: 8px; }
@@ -152,8 +149,10 @@
             <div id="p2" class="dot" onpointerup="selectPreset('p2')"></div>
             <div id="p3" class="dot" onpointerup="selectPreset('p3')"></div>
         </div>
-        <div class="custom-color-wapper">
-            <input type="color" id="color-picker" value="#a3c1da" onchange="applyBG(this.value)">
+        <div class="custom-color-wrapper">
+            <div class="picker-container">
+                <input type="color" id="color-picker" value="#a3c1da" onchange="applyBG(this.value)">
+            </div>
             <button class="btn-dot-ok" style="width:44px; height:44px; box-shadow: 0 4px 0 #4a7a66;" onpointerup="location.reload()">
                 <div class="reload-icon"></div>
             </button>
