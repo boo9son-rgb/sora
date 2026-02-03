@@ -260,15 +260,15 @@
                 particles.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
-                    l: Math.random() * 15 + 10, // 存在感を出すため少し長く
-                    v: Math.random() * 4 + 7    // スピードも微増
+                    l: Math.random() * 15 + 10, 
+                    v: Math.random() * 4 + 7    
                 });
             } else {
                 particles.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * (canvas.height * 0.35),
                     s: Math.random() * 0.3 + 0.15,
-                    w: Math.random() * 50 + 70 
+                    w: Math.random() * 40 + 60 
                 });
             }
         }
@@ -281,34 +281,38 @@
         if (effectType === 'rain') {
             ctx.lineWidth = 1.5;
             particles.forEach(p => {
-                ctx.strokeStyle = 'rgba(0,0,0,0.25)'; // 影を少し強めに
+                ctx.strokeStyle = 'rgba(0,0,0,0.25)'; 
                 ctx.beginPath(); ctx.moveTo(p.x+1, p.y+1); ctx.lineTo(p.x+1, p.y + p.l + 1); ctx.stroke();
-                ctx.strokeStyle = 'rgba(255,255,255,0.7)'; // 白の透明度を上げ存在感を出す
+                ctx.strokeStyle = 'rgba(255,255,255,0.7)'; 
                 ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x, p.y + p.l); ctx.stroke();
                 p.y += p.v;
                 if (p.y > canvas.height) { p.y = -p.l; p.x = Math.random() * canvas.width; }
             });
         } else {
             particles.forEach(p => {
-                const drawMokoCloud = (x, y, baseW) => {
+                const drawPixelCloud = (x, y, baseW) => {
                     const h = baseW * 0.6;
-                    // より濃い影
-                    ctx.fillStyle = 'rgba(0,0,0,0.18)';
-                    const sx = x + 2.5, sy = y + 2.5;
-                    ctx.fillRect(sx, sy, baseW, h*0.5); 
-                    ctx.fillRect(sx+baseW*0.1, sy-h*0.2, baseW*0.4, h*0.4);
-                    ctx.fillRect(sx+baseW*0.3, sy-h*0.4, baseW*0.5, h*0.6);
-                    ctx.fillRect(sx+baseW*0.6, sy-h*0.1, baseW*0.3, h*0.3);
+                    const blocks = [
+                        { dx: 0, dy: 0, bw: 1.0, bh: 0.4 },      // 中段
+                        { dx: 0.1, dy: -0.2, bw: 0.8, bh: 0.6 }, // 上段
+                        { dx: 0.25, dy: -0.4, bw: 0.5, bh: 0.8 },// 頂点
+                        { dx: 0.15, dy: 0.15, bw: 0.7, bh: 0.35 },// 下段中央
+                        { dx: 0.05, dy: 0.05, bw: 0.3, bh: 0.3 }  // 下段左
+                    ];
                     
-                    // モコモコ本体（複数ブロックの組み合わせ）
+                    // 影の描画
+                    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+                    blocks.forEach(b => {
+                        ctx.fillRect(x + b.dx * baseW + 3, y + b.dy * h + 3, b.bw * baseW, b.bh * h);
+                    });
+                    
+                    // 本体（ドラクエ風ドットの組み合わせ）
                     ctx.fillStyle = 'white';
-                    ctx.fillRect(x, y, baseW, h*0.5); // 基盤
-                    ctx.fillRect(x+baseW*0.1, y-h*0.2, baseW*0.4, h*0.4); // 左盛り上がり
-                    ctx.fillRect(x+baseW*0.3, y-h*0.4, baseW*0.5, h*0.6); // 中央メイン
-                    ctx.fillRect(x+baseW*0.6, y-h*0.1, baseW*0.3, h*0.3); // 右端の丸み
-                    ctx.fillRect(x+baseW*0.2, y+h*0.2, baseW*0.6, h*0.3); // 下部の厚み
+                    blocks.forEach(b => {
+                        ctx.fillRect(x + b.dx * baseW, y + b.dy * h, b.bw * baseW, b.bh * h);
+                    });
                 };
-                drawMokoCloud(p.x, p.y, p.w);
+                drawPixelCloud(p.x, p.y, p.w);
                 p.x += p.s;
                 if (p.x > canvas.width) { p.x = -p.w * 1.5; p.y = Math.random() * (canvas.height * 0.35); }
             });
