@@ -18,30 +18,27 @@
             --shadow: 0 8px 30px rgba(0,0,0,0.12);
         }
 
-        /* 修正箇所：ビューポートと背景を物理的に画面の下端へ強制接着 */
+        /* 修正箇所：html自体に背景色を塗り、余白を「色」で埋める（画像には影響させない） */
         html {
-            height: -webkit-fill-available;
+            height: 100%;
             overflow: hidden;
-            background-color: var(--sky-blue);
+            background-color: var(--sky-blue); /* ここで下の隙間を同じ色で埋める */
             position: fixed;
             width: 100%;
-            top: 0; left: 0; bottom: 0; right: 0;
+            top: 0; left: 0;
         }
 
         body { 
             margin: 0; padding: 0; 
-            height: 100dvh; /* 動的ビューポートを優先 */
+            height: 100dvh; 
             width: 100vw;
             font-family: 'DotGothic16', sans-serif; 
             color: var(--text-dark); 
             overflow: hidden; 
             position: fixed; 
-            top: 0; left: 0; bottom: 0 !important; /* 強制的に底辺へ */
+            top: 0; left: 0;
             overscroll-behavior: none;
-            background-size: cover;
-            background-position: center center;
-            background-repeat: no-repeat;
-            background-color: var(--sky-blue);
+            background-color: transparent; /* bodyは透明にしてhtmlの色を見せる */
         }
 
         * { 
@@ -54,17 +51,17 @@
             user-select: text !important; 
         }
 
-        /* 背景レイヤー：計算上の隙間を埋めるため下方向に20vh分突き抜けさせる */
+        /* 背景レイヤー：サイズを100%（ズームなし）に戻し、位置を「上端固定」にする */
         .sky-bg { 
             position: absolute; 
             top: 0; 
             left: 0; 
             width: 100%; 
-            height: 120vh; /* 画面より20%長くして下端の隙間を物理的に隠す */
+            height: 100dvh; /* 画面ぴったりに修正（ズーム防止） */
             z-index: -2; 
             background-color: transparent;
             background-size: cover;
-            background-position: center center;
+            background-position: top center; /* 上基準にすることで下が余っても画像が歪まない */
             background-repeat: no-repeat;
         }
 
@@ -353,25 +350,21 @@
         if(!val) return; 
         currentBGValue = val;
         const bg = document.getElementById('sky-bg'); 
-        const els = [document.documentElement, document.body, bg];
+        const html = document.documentElement;
 
         if (val === 'default') { 
-            els.forEach(el => {
-                el.style.backgroundColor = '#a3c1da';
-                el.style.backgroundImage = 'none';
-            });
+            bg.style.backgroundImage = 'none';
+            bg.style.backgroundColor = 'transparent';
+            html.style.backgroundColor = '#a3c1da'; /* htmlの色で隙間を埋める */
             currentBGValue = '#a3c1da';
         } else if (val.startsWith('data:image')) { 
-            const url = `url(${val})`;
-            els.forEach(el => {
-                el.style.backgroundImage = url;
-                el.style.backgroundColor = 'transparent';
-            });
+            bg.style.backgroundImage = `url(${val})`;
+            bg.style.backgroundColor = 'transparent';
+            html.style.backgroundColor = 'black'; /* 画像時は黒で隙間を埋めるか、近似色にする */
         } else { 
-            els.forEach(el => {
-                el.style.backgroundColor = val;
-                el.style.backgroundImage = 'none';
-            });
+            bg.style.backgroundImage = 'none';
+            bg.style.backgroundColor = 'transparent';
+            html.style.backgroundColor = val; /* htmlの色で隙間を埋める */
         } 
         localStorage.setItem('sora_bg_v7_solid', val); 
     }
@@ -477,7 +470,7 @@
                 <b>■移動：</b>${data.q6}<br>
                 <b>■テーマ：</b>${data.q7}<br>
                 <b>■こだわり：</b>${data.q8}<br>
-                <b>番外編・NG条件：</b>${data.q9}
+                <b>■NG条件：</b>${data.q9}
             `; 
         } 
     }
