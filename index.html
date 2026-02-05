@@ -34,7 +34,6 @@
             color: var(--text-dark); 
             overflow: hidden; 
             position: fixed;
-            /* iPhoneのズレ防止用 */
             top: 0; left: 0; right: 0; bottom: 0;
             overscroll-behavior: none;
             background-color: var(--sky-blue);
@@ -47,11 +46,8 @@
 
         .sky-bg { 
             position: fixed; 
-            /* 全体表示に修正 */
-            top: 0;
-            left: 0; 
-            width: 100%; 
-            height: 100%;
+            top: 0; left: 0; 
+            width: 100%; height: 100%;
             z-index: -2; 
             background-color: transparent;
             pointer-events: none;
@@ -127,13 +123,14 @@
         
         .window { 
             background: rgba(255, 255, 255, var(--window-opacity));
-            backdrop-filter: blur(12px); 
+            backdrop-filter: blur(4px); 
             border-radius: 20px; padding: 20px; width: 100%; max-width: 320px; 
             text-align: center; box-shadow: var(--shadow); border: 1px solid rgba(255, 255, 255, 0.6); 
             height: 380px; 
             display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;
             margin-top: calc(env(safe-area-inset-top) / 2);
             text-shadow: var(--dynamic-text-shadow); 
+            color: var(--text-dark);
         }
 
         h2 { font-size: 1.0rem; margin-top: 0; margin-bottom: 10px; }
@@ -142,10 +139,13 @@
         .inventory-grid::-webkit-scrollbar { display: none; }
 
         .item-chip { 
-            background: white; border: 1px solid #ddd; border-radius: 10px; 
+            background: rgba(255, 255, 255, var(--window-opacity)); 
+            border: 1px solid rgba(221, 221, 221, var(--window-opacity)); 
+            border-radius: 10px; 
             padding: 4px 6px; font-size: 0.85rem; cursor: pointer; 
-            box-shadow: 0 4px 0 #ccc; display: flex; align-items: center; justify-content: center; min-height: 44px; position: relative;
-            text-shadow: none;
+            box-shadow: 0 4px 0 rgba(204, 204, 204, var(--window-opacity)); 
+            display: flex; align-items: center; justify-content: center; min-height: 44px; position: relative;
+            text-shadow: inherit;
         }
         .item-chip:active { transform: translateY(4px); box-shadow: 0 0 0 #ccc; background: var(--accent-orange); color: white; border-color: transparent; }
         .item-chip.selected { background: var(--accent-orange); color: white; border-color: transparent; box-shadow: 0 4px 0 #d47e4d; }
@@ -156,11 +156,22 @@
         .slot-item.active { color: var(--text-dark); font-weight: bold; font-size: 1.1rem; }
         .slot-overlay { position: absolute; top: 40px; left: 0; width: 100%; height: 40px; pointer-events: none; border-top: 1px solid rgba(0,0,0,0.1); border-bottom: 1px solid rgba(0,0,0,0.1); background: rgba(0, 0, 0, 0.03); }
 
-        .btn-main { width: 100%; margin-top: 10px; padding: 12px; background: var(--text-dark) ; color: white; border: none; border-radius: 10px; font-family: inherit; font-size: 0.9rem; box-shadow: 0 4px 0 #222; cursor: pointer; position: relative; transition: transform 0.05s; text-shadow: none; }
+        .btn-main { 
+            width: 100%; margin-top: 10px; padding: 12px; 
+            background: rgba(74, 85, 104, var(--window-opacity));
+            color: white; border: none; border-radius: 10px; font-family: inherit; font-size: 0.9rem; 
+            box-shadow: 0 4px 0 rgba(34, 34, 34, var(--window-opacity)); 
+            cursor: pointer; position: relative; transition: transform 0.05s; 
+            text-shadow: inherit; 
+        }
         .btn-main:active { transform: translateY(4px); box-shadow: 0 0 0 #222; }
 
         .free-input-wrapper { display: flex; gap: 8px; width: 100%; margin-top: 8px; text-shadow: none; }
-        .free-input, textarea { width: 100%; border: 1px solid #ddd; border-radius: 10px; padding: 10px; font-family: inherit; box-sizing: border-box; font-size: 0.85rem; outline: none; text-shadow: none; }
+        .free-input, textarea { 
+            width: 100%; border: 1px solid #ddd; border-radius: 10px; padding: 10px; font-family: inherit; 
+            box-sizing: border-box; font-size: 0.85rem; outline: none; text-shadow: none; 
+            background: rgba(255, 255, 255, 0.8);
+        }
         
         .btn-dot-ok { 
             width: 44px; height: 44px; background: var(--accent-green); color: white; 
@@ -176,7 +187,7 @@
         }
 
         textarea { height: 80px; resize: none; margin-top: 8px; }
-        #summary { font-size:0.8rem; text-align:left; background:rgba(0,0,0,0.05); padding:12px; border-radius:10px; overflow-y:auto; flex:1; margin-bottom:5px; line-height:1.5; text-shadow: none; }
+        #summary { font-size:0.8rem; text-align:left; background:rgba(0,0,0,0.05); padding:12px; border-radius:10px; overflow-y:auto; flex:1; margin-bottom:5px; line-height:1.5; text-shadow: inherit; }
 
         .btn-main.success { background: var(--accent-green) !important; box-shadow: 0 4px 0 #4a7a66 !important; }
     </style>
@@ -359,8 +370,18 @@
         const opacity = val / 100;
         const root = document.documentElement;
         root.style.setProperty('--window-opacity', opacity);
-        const shadowAlpha = (100 - val) / 100 * 0.8; 
-        root.style.setProperty('--dynamic-text-shadow', `1px 1px 3px rgba(0,0,0,${shadowAlpha})`);
+        
+        const shadowIntensity = (1 - opacity).toFixed(2);
+        const shadowColor = `rgba(0,0,0, ${shadowIntensity * 0.8})`;
+        
+        if (opacity < 0.8) {
+            root.style.setProperty('--dynamic-text-shadow', 
+                `1px 1px 0 ${shadowColor}, -1px -1px 0 ${shadowColor}, 1px -1px 0 ${shadowColor}, -1px 1px 0 ${shadowColor}, 0 2px 4px rgba(0,0,0,0.3)`);
+            root.style.setProperty('--text-dark', opacity < 0.4 ? '#000' : '#4a5568');
+        } else {
+            root.style.setProperty('--dynamic-text-shadow', '0 0 0 rgba(0,0,0,0)');
+            root.style.setProperty('--text-dark', '#4a5568');
+        }
         localStorage.setItem('sora_window_opacity', val);
     }
 
@@ -535,8 +556,8 @@
         navigator.clipboard.writeText(text).then(() => {
             const btn = document.getElementById('btn-finish');
             btn.innerText = "よみこみちゅう・・・"; btn.classList.add('success');
-            // Geminiアプリを優先起動するURL
-            setTimeout(() => { window.location.href = "https://gemini.google.com/app"; }, ACTION_DELAY + 500);
+            // 標準的なURLに戻す
+            setTimeout(() => { window.location.href = "https://gemini.google.com/"; }, ACTION_DELAY + 500);
         });
     }
     initSlots();
