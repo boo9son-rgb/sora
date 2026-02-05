@@ -17,8 +17,11 @@
             --text-dark: #4a5568;
             --shadow: 0 8px 30px rgba(0,0,0,0.12);
             --window-opacity: 0.9;
+            /* 透明度連動用：背景色のアルファ値 */
+            --bg-alpha: 0.9;
+            /* 透明度連動用：ボタン類のアルファ値（1.0から減衰） */
+            --content-alpha: 1.0;
             --dynamic-text-shadow: 0 0 0 rgba(0,0,0,0);
-            --element-bg-alpha: 1; /* 透明度100%で0になる */
         }
 
         * { 
@@ -39,34 +42,82 @@
             background-color: var(--sky-blue);
         }
 
-        /* 背景：最背面 */
+        input, textarea { 
+            -webkit-user-select: text !important; 
+            user-select: text !important; 
+        }
+
         .sky-bg { 
             position: fixed; 
             top: 0; left: 0; 
             width: 100%; height: 100%;
-            z-index: -10; 
-            pointer-events: auto; /* ここをタップでパネルを閉じる */
+            z-index: -2; 
+            pointer-events: none;
             background-size: cover !important;
             background-position: center !important;
         }
 
         #effect-canvas {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -5; pointer-events: none;
+            z-index: -1; pointer-events: none;
         }
 
-        /* ビューポート：中央 */
-        .viewport { 
-            display: flex; height: 100%; 
-            transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1);
-            position: relative; z-index: 10; 
+        .bg-settings { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); right: 20px; z-index: 10000; }
+        .bg-btn { width: 44px; height: 44px; border: none; background: none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.1s; font-family: inherit; display: flex; align-items: center; justify-content: center; }
+        .bg-btn:active { transform: translateY(4px); text-shadow: 0 0 0 rgba(0,0,0,0); }
+
+        .btn-back { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 15px; border: none; background: none; width: 44px; height: 44px; z-index: 1001; display:none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); font-family: inherit; align-items: center; justify-content: center; transition: transform 0.1s; }
+        .btn-back:active { transform: translateY(4px); text-shadow: 0 0 0 rgba(0,0,0,0); }
+        
+        .bg-panel { 
+            position: absolute; bottom: 60px; right: 0; background: var(--cloud-white); 
+            padding: 15px; border-radius: 15px; box-shadow: var(--shadow); 
+            display: none; backdrop-filter: blur(10px); width: 210px; border: 1px solid white; 
         }
 
+        .color-dots { display: flex; gap: 8px; justify-content: center; margin-bottom: 10px; flex-wrap: wrap; }
+        .dot { 
+            width: 34px; height: 34px; border-radius: 50%; cursor: pointer; 
+            border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+        }
+        .dot.active-preset { border-color: var(--accent-orange); box-shadow: 0 0 8px var(--accent-orange); }
+
+        .custom-color-wrapper { display: flex; flex-direction: column; gap: 8px; }
+        .btn-row { display: flex; gap: 5px; width: 100%; }
+        
+        .btn-panel-item { 
+            flex: 1; padding: 8px; font-size: 0.75rem; border-radius: 10px; 
+            font-family: inherit; cursor: pointer; display: flex; align-items: center; 
+            justify-content: center; position: relative; border: 1px solid #ddd;
+            box-shadow: 0 4px 0 #ccc; background: white; transition: transform 0.05s;
+        }
+        .btn-panel-item:active { transform: translateY(4px); box-shadow: 0 0 0 #ccc; }
+
+        .btn-panel-dark {
+            background: var(--text-dark) !important;
+            color: white !important;
+            border-color: transparent !important;
+            box-shadow: 0 4px 0 #222 !important;
+        }
+
+        .opacity-slider-row {
+            background: rgba(0,0,0,0.05); padding: 8px; border-radius: 10px; margin-bottom: 8px; font-size: 0.8rem;
+        }
+        .opacity-slider-row span { display: block; margin-bottom: 5px; }
+        .opacity-input { width: 100%; cursor: pointer; accent-color: var(--accent-orange); }
+
+        .effect-switch-row {
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(0,0,0,0.05); padding: 8px; border-radius: 10px; margin-bottom: 8px; font-size: 0.8rem;
+        }
+
+        .viewport { display: flex; height: 100%; transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1); }
         .card { min-width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; }
-
+        
+        /* 透明度改善のコア：RGBAで背景色を定義 */
         .window { 
-            background: rgba(255, 255, 255, var(--window-opacity));
-            backdrop-filter: blur(calc(12px * var(--element-bg-alpha))); 
+            background: rgba(255, 255, 255, var(--bg-alpha));
+            backdrop-filter: blur(calc(12px * (1 - var(--content-alpha) * 0.5))); 
             border-radius: 20px; padding: 20px; width: 100%; max-width: 320px; 
             text-align: center; box-shadow: var(--shadow); 
             border: 1px solid rgba(255, 255, 255, 0.6); 
@@ -76,67 +127,62 @@
             text-shadow: var(--dynamic-text-shadow);
         }
 
-        /* ボタン類の共通設定：透明度100%でも枠線は残す */
-        .item-chip, .btn-main, .btn-dot-ok, .free-input, textarea {
-            text-shadow: var(--dynamic-text-shadow);
-            transition: transform 0.05s, background 0.1s;
-        }
-
-        .item-chip { 
-            background: rgba(255, 255, 255, var(--element-bg-alpha)); 
-            border: 1px solid #ddd; border-radius: 10px; 
-            padding: 4px 6px; font-size: 0.85rem; cursor: pointer; 
-            box-shadow: 0 4px 0 rgba(204, 204, 204, var(--element-bg-alpha)); 
-            display: flex; align-items: center; justify-content: center; min-height: 44px;
-        }
-        .item-chip:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; }
-        .item-chip.selected { background: var(--accent-orange); color: white; border-color: transparent; }
-
-        .btn-main { 
-            width: 100%; margin-top: 10px; padding: 12px; 
-            background: rgba(74, 85, 104, var(--element-bg-alpha)); 
-            color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; 
-            font-family: inherit; font-size: 0.9rem; 
-            box-shadow: 0 4px 0 rgba(34, 34, 34, var(--element-bg-alpha)); 
-            cursor: pointer;
-        }
-        .btn-main:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; }
-
-        /* 背景設定パネル関連：透明度の影響を受けない */
-        .bg-settings { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); right: 20px; z-index: 10000; }
-        .bg-panel { 
-            position: absolute; bottom: 60px; right: 0; 
-            background: rgba(255, 255, 255, 0.98); 
-            padding: 15px; border-radius: 15px; box-shadow: var(--shadow); 
-            display: none; backdrop-filter: blur(10px); width: 210px; border: 1px solid #fff; 
-            color: var(--text-dark); text-shadow: none !important;
-        }
-        .bg-panel * { text-shadow: none !important; }
-
-        .bg-btn, .btn-back { border: none; background: none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); font-family: inherit; display: flex; align-items: center; justify-content: center; z-index: 1001; }
-        .btn-back { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 15px; display:none; }
-
-        .inventory-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; overflow-y: auto; padding: 4px; flex-grow: 1; -webkit-overflow-scrolling: touch; }
-        .inventory-grid::-webkit-scrollbar { display: none; }
+        h2 { font-size: 1.0rem; margin-top: 0; margin-bottom: 10px; }
         
+        .inventory-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; overflow-y: auto; padding: 4px; flex-grow: 1; }
+        .inventory-grid::-webkit-scrollbar { display: none; }
+
+        /* アイテムチップの透明度連動 */
+        .item-chip { 
+            background: rgba(255, 255, 255, var(--content-alpha)); 
+            border: 1px solid rgba(221, 221, 221, var(--content-alpha)); 
+            border-radius: 10px; 
+            padding: 4px 6px; font-size: 0.85rem; cursor: pointer; 
+            box-shadow: 0 4px 0 rgba(204, 204, 204, var(--content-alpha)); 
+            display: flex; align-items: center; justify-content: center; min-height: 44px; position: relative;
+        }
+        .item-chip:active { transform: translateY(4px); box-shadow: 0 0 0 #ccc; background: var(--accent-orange); color: white; }
+        .item-chip.selected { background: var(--accent-orange); color: white; border-color: transparent; box-shadow: 0 4px 0 #d47e4d; }
+
         .slot-container { position: relative; height: 120px; overflow: hidden; margin: 5px 0; background: rgba(0,0,0,0.05); border-radius: 12px; touch-action: none; }
         .slot-reel { transition: transform 0.3s ease-out; }
         .slot-item { height: 40px; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; color: #888; }
         .slot-item.active { color: var(--text-dark); font-weight: bold; font-size: 1.1rem; }
         .slot-overlay { position: absolute; top: 40px; left: 0; width: 100%; height: 40px; pointer-events: none; border-top: 1px solid rgba(0,0,0,0.1); border-bottom: 1px solid rgba(0,0,0,0.1); background: rgba(0, 0, 0, 0.03); }
 
-        .free-input-wrapper { display: flex; gap: 8px; width: 100%; margin-top: 8px; }
-        .free-input, textarea { width: 100%; border: 1px solid #ddd; border-radius: 10px; padding: 10px; font-family: inherit; font-size: 0.85rem; outline: none; background: rgba(255,255,255, var(--element-bg-alpha)); }
-        
-        .btn-dot-ok { width: 44px; height: 44px; background: var(--accent-green); color: white; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 0 #4a7a66; cursor: pointer; }
-        .pixel-check { width: 16px; height: 16px; background-color: white; clip-path: polygon(0% 50%, 12.5% 50%, 12.5% 62.5%, 25% 62.5%, 25% 75%, 37.5% 75%, 37.5% 87.5%, 50% 87.5%, 50% 75%, 62.5% 75%, 62.5% 62.5%, 75% 62.5%, 75% 50%, 87.5% 50%, 87.5% 37.5%, 100% 37.5%, 100% 12.5%, 87.5% 12.5%, 87.5% 25%, 75% 25%, 75% 37.5%, 62.5% 37.5%, 62.5% 50%, 50% 50%, 50% 62.5%, 37.5% 62.5%, 37.5% 50%, 25% 50%, 25% 37.5%, 12.5% 37.5%, 12.5% 50%, 0% 50%); }
+        /* メインボタンの透明度連動 */
+        .btn-main { 
+            width: 100%; margin-top: 10px; padding: 12px; 
+            background: rgba(74, 85, 104, var(--content-alpha)); 
+            color: rgba(255, 255, 255, var(--content-alpha)); 
+            border: none; border-radius: 10px; font-family: inherit; font-size: 0.9rem; 
+            box-shadow: 0 4px 0 rgba(34, 34, 34, var(--content-alpha)); 
+            cursor: pointer; position: relative; transition: transform 0.05s; 
+        }
+        .btn-main:active { transform: translateY(4px); box-shadow: 0 0 0 #222; }
 
-        .opacity-slider-row { background: rgba(0,0,0,0.05); padding: 8px; border-radius: 10px; margin-bottom: 8px; font-size: 0.8rem; }
-        .opacity-input { width: 100%; cursor: pointer; accent-color: var(--accent-orange); }
-        .btn-row { display: flex; gap: 5px; width: 100%; margin-top: 5px; }
-        .btn-panel-item { flex: 1; padding: 8px; font-size: 0.75rem; border-radius: 10px; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; background: white; border: 1px solid #ddd; box-shadow: 0 4px 0 #ccc; position: relative; }
-        .btn-panel-item:active { transform: translateY(2px); box-shadow: 0 2px 0 #ccc; }
-        .btn-panel-dark { background: var(--text-dark) !important; color: white !important; box-shadow: 0 4px 0 #222 !important; }
+        .free-input-wrapper { display: flex; gap: 8px; width: 100%; margin-top: 8px; }
+        .free-input, textarea { 
+            width: 100%; border: 1px solid #ddd; border-radius: 10px; padding: 10px; font-family: inherit; font-size: 0.85rem; outline: none; 
+            background: rgba(255, 255, 255, var(--content-alpha));
+        }
+        
+        .btn-dot-ok { 
+            width: 44px; height: 44px; background: rgba(103, 163, 139, var(--content-alpha)); 
+            color: white; border: none; border-radius: 50%; font-family: inherit; 
+            box-shadow: 0 4px 0 rgba(74, 122, 102, var(--content-alpha)); 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; 
+        }
+
+        .pixel-check {
+            width: 16px; height: 16px; background-color: white;
+            clip-path: polygon(0% 50%, 12.5% 50%, 12.5% 62.5%, 25% 62.5%, 25% 75%, 37.5% 75%, 37.5% 87.5%, 50% 87.5%, 50% 75%, 62.5% 75%, 62.5% 62.5%, 75% 62.5%, 75% 50%, 87.5% 50%, 87.5% 37.5%, 100% 37.5%, 100% 12.5%, 87.5% 12.5%, 87.5% 25%, 75% 25%, 75% 37.5%, 62.5% 37.5%, 62.5% 50%, 50% 50%, 50% 62.5%, 37.5% 62.5%, 37.5% 50%, 25% 50%, 25% 37.5%, 12.5% 37.5%, 12.5% 50%, 0% 50%);
+        }
+
+        textarea { height: 80px; resize: none; margin-top: 8px; }
+        #summary { font-size:0.8rem; text-align:left; background:rgba(0,0,0,calc(0.05 * var(--content-alpha))); padding:12px; border-radius:10px; overflow-y:auto; flex:1; margin-bottom:5px; line-height:1.5; }
+
+        .btn-main.success { background: var(--accent-green) !important; box-shadow: 0 4px 0 #4a7a66 !important; }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -157,20 +203,25 @@
         <div class="custom-color-wrapper">
             <div class="opacity-slider-row">
                 <span>ウィンドウの透明度</span>
-                <input type="range" class="opacity-input" id="opacity-slider" min="0" max="100" value="90" oninput="updateOpacity(this.value)">
+                <input type="range" class="opacity-input" id="opacity-slider" min="0" max="100" value="10" oninput="updateOpacity(this.value)">
+            </div>
+
+            <div class="effect-switch-row">
+                <span>エフェクト</span>
+                <input type="checkbox" id="effect-toggle" class="switch-input" onchange="toggleEffect(this.checked)">
             </div>
             <div class="btn-row">
-                <div class="btn-panel-item btn-panel-dark">
+                <div class="btn-panel-item picker-btn btn-panel-dark">
                     パレット
-                    <input type="color" id="color-picker" style="position:absolute; opacity:0; top:0; left:0; width:100%; height:100%; cursor:pointer;" oninput="applyBG(this.value)">
+                    <input type="color" id="color-picker" value="#a3c1da" oninput="applyBG(this.value)">
                 </div>
                 <div class="btn-panel-item btn-panel-dark" onpointerup="location.reload()">こうしん</div>
             </div>
+            <input type="file" id="bg-upload" accept="image/*" style="display:none" onchange="uploadBG(this)">
             <div class="btn-row">
                 <div class="btn-panel-item btn-panel-dark" onpointerup="document.getElementById('bg-upload').click()">画像えらぶ</div>
                 <div id="save-preset-btn" class="btn-panel-item" style="background:var(--accent-green); color:white; border-color:transparent; box-shadow:0 4px 0 #4a7a66;" onpointerup="saveToSelectedPreset()">保存する</div>
             </div>
-            <input type="file" id="bg-upload" accept="image/*" style="display:none" onchange="uploadBG(this)">
         </div>
     </div>
     <button class="bg-btn" onpointerup="toggleBGPanel(event)">…</button>
@@ -190,7 +241,7 @@
 </div>
 
 <script>
-    // 状態管理
+    // 基本設定・状態管理
     let step = 0;
     let startY = 0, moveY = 0; 
     const data = { q1:'', q2:[], q3:'', q4:'', q5:'', q6:'', q7:'', q8:'', q9:'' };
@@ -201,18 +252,94 @@
     let currentBGValue = '#a3c1da';
     const ACTION_DELAY = 250; 
 
-    // 透明度反映（文字影と背景色を同期）
-    function updateOpacity(val) {
-        const opacity = val / 100;
-        const root = document.documentElement;
-        root.style.setProperty('--window-opacity', opacity);
-        root.style.setProperty('--element-bg-alpha', opacity);
-        const shadowAlpha = (1 - opacity) * 0.85;
-        root.style.setProperty('--dynamic-text-shadow', `1px 1px 3px rgba(0,0,0,${shadowAlpha})`);
-        localStorage.setItem('sora_window_opacity', val);
+    // エフェクト関連
+    let effectActive = false;
+    let effectType = 'none'; 
+    const canvas = document.getElementById('effect-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        if(effectActive) initParticles();
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function toggleEffect(active) {
+        effectActive = active;
+        localStorage.setItem('sora_effect_enabled', active);
+        if (active) {
+            effectType = Math.random() > 0.5 ? 'rain' : 'cloud';
+            initParticles();
+            requestAnimationFrame(animate);
+        } else {
+            particles = [];
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
     }
 
-    // 背景適用
+    function initParticles() {
+        particles = [];
+        const count = effectType === 'rain' ? 35 : 4; 
+        for (let i = 0; i < count; i++) {
+            if (effectType === 'rain') {
+                particles.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, l: Math.random() * 15 + 10, v: Math.random() * 4 + 7 });
+            } else {
+                particles.push({ x: Math.random() * canvas.width, y: Math.random() * (canvas.height * 0.35), s: Math.random() * 0.3 + 0.15, w: Math.random() * 80 + 70 });
+            }
+        }
+    }
+
+    function animate() {
+        if (!effectActive) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (effectType === 'rain') {
+            ctx.lineWidth = 1.5;
+            particles.forEach(p => {
+                ctx.strokeStyle = 'rgba(0,0,0,0.25)'; ctx.beginPath(); ctx.moveTo(p.x+1, p.y+1); ctx.lineTo(p.x+1, p.y + p.l + 1); ctx.stroke();
+                ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x, p.y + p.l); ctx.stroke();
+                p.y += p.v;
+                if (p.y > canvas.height) { p.y = -p.l; p.x = Math.random() * canvas.width; }
+            });
+        } else {
+            particles.forEach(p => {
+                const drawPixelCloud = (x, y, baseW) => {
+                    const h = baseW * 0.6;
+                    const blocks = [{ dx: 0, dy: 0, bw: 1.0, bh: 0.4 }, { dx: 0.1, dy: -0.2, bw: 0.8, bh: 0.6 }, { dx: 0.25, dy: -0.4, bw: 0.5, bh: 0.8 }, { dx: 0.15, dy: 0.15, bw: 0.7, bh: 0.35 }, { dx: 0.05, dy: 0.05, bw: 0.3, bh: 0.3 }];
+                    ctx.fillStyle = 'rgba(0,0,0,0.2)'; blocks.forEach(b => { ctx.fillRect(x + b.dx * baseW + 3, y + b.dy * h + 3, b.bw * baseW, b.bh * h); });
+                    ctx.fillStyle = 'white'; blocks.forEach(b => { ctx.fillRect(x + b.dx * baseW, y + b.dy * h, b.bw * baseW, b.bh * h); });
+                };
+                drawPixelCloud(p.x, p.y, p.w);
+                p.x += p.s;
+                if (p.x > canvas.width) { p.x = -p.w * 1.5; p.y = Math.random() * (canvas.height * 0.35); p.w = Math.random() * 80 + 70; }
+            });
+        }
+        requestAnimationFrame(animate);
+    }
+
+    // 透明度改善のロジック
+    function updateOpacity(val) {
+        const root = document.documentElement;
+        // val=0(不透明) -> alpha=0.9, val=100(透明) -> alpha=0.0
+        const bgAlpha = (0.9 * (1 - (val / 100))).toFixed(2);
+        // ボタン等の要素は1.0から0.0へ
+        const contentAlpha = (1 - (val / 100)).toFixed(2);
+        
+        root.style.setProperty('--bg-alpha', bgAlpha);
+        root.style.setProperty('--content-alpha', contentAlpha);
+        
+        // 文字の影を透明度に合わせて強くする（背景が見えるほど影を濃くして可読性確保）
+        const shadowAlpha = (val / 100 * 0.7).toFixed(2);
+        root.style.setProperty('--dynamic-text-shadow', `1px 1px 3px rgba(0,0,0,${shadowAlpha})`);
+        
+        localStorage.setItem('sora_window_opacity_v8', val);
+    }
+
+    function toggleBGPanel(e) { if(e) e.stopPropagation(); const p = document.getElementById('bg-panel'); p.style.display = (p.style.display === 'block') ? 'none' : 'block'; }
+    function closeBGPanel() { const p = document.getElementById('bg-panel'); if (p.style.display === 'block') p.style.display = 'none'; }
+
     function applyBG(val) { 
         if(!val) return; 
         currentBGValue = val;
@@ -220,30 +347,58 @@
         if (val === 'default') { 
             document.body.style.backgroundColor = '#a3c1da';
             bg.style.backgroundImage = 'none'; 
+            currentBGValue = '#a3c1da';
         } else if (val.startsWith('data:image')) { 
             bg.style.background = `url(${val}) center / cover no-repeat fixed`; 
         } else { 
             document.body.style.backgroundColor = val;
             bg.style.backgroundImage = 'none'; 
         } 
-        localStorage.setItem('sora_bg_v7_solid', val); 
+        localStorage.setItem('sora_bg_v8_solid', val); 
+    }
+    
+    function selectPreset(id) {
+        document.querySelectorAll('.dot').forEach(d => d.classList.remove('active-preset'));
+        document.getElementById(id).classList.add('active-preset');
+        selectedPresetId = id;
+        const img = localStorage.getItem('sora_img_v8_' + id);
+        const col = localStorage.getItem('sora_col_v8_' + id);
+        if (img) applyBG(img); else if (col) applyBG(col);
     }
 
-    // スロット・UI初期化
+    function saveToSelectedPreset() {
+        if (!selectedPresetId) return alert("保存先の○をえらんでね！");
+        const dot = document.getElementById(selectedPresetId);
+        if (currentBGValue.startsWith('data:image')) {
+            dot.style.backgroundImage = `url(${currentBGValue})`; dot.style.backgroundSize = 'cover';
+            localStorage.setItem('sora_img_v8_' + selectedPresetId, currentBGValue);
+            localStorage.removeItem('sora_col_v8_' + selectedPresetId);
+        } else {
+            dot.style.backgroundImage = 'none'; dot.style.backgroundColor = currentBGValue;
+            localStorage.setItem('sora_col_v8_' + selectedPresetId, currentBGValue);
+            localStorage.removeItem('sora_img_v8_' + selectedPresetId);
+        }
+        alert("保存したよ！");
+    }
+
+    function uploadBG(input) { if (input.files?.[0]) { const reader = new FileReader(); reader.onload = (e) => applyBG(e.target.result); reader.readAsDataURL(input.files[0]); } }
+    
     function initSlots() { 
         ['p1', 'p2', 'p3'].forEach(id => { 
-            const savedColor = localStorage.getItem('sora_preset_v7_' + id); 
-            const savedImage = localStorage.getItem('sora_img_preset_v7_' + id);
-            const dot = document.getElementById(id);
-            if(savedImage) { dot.style.backgroundImage = `url(${savedImage})`; dot.style.backgroundSize = 'cover'; }
-            else if(savedColor) { dot.style.backgroundColor = savedColor; }
+            const col = localStorage.getItem('sora_col_v8_' + id); 
+            const img = localStorage.getItem('sora_img_v8_' + id);
+            if(img) { document.getElementById(id).style.backgroundImage = `url(${img})`; document.getElementById(id).style.backgroundSize = 'cover'; }
+            else if(col) { document.getElementById(id).style.backgroundColor = col; }
         }); 
-        const savedBG = localStorage.getItem('sora_bg_v7_solid'); 
+        const savedBG = localStorage.getItem('sora_bg_v8_solid'); 
         if (savedBG) applyBG(savedBG); else applyBG('default');
 
-        const savedOpacity = localStorage.getItem('sora_window_opacity');
-        updateOpacity(savedOpacity !== null ? savedOpacity : 90);
-        document.getElementById('opacity-slider').value = savedOpacity !== null ? savedOpacity : 90;
+        const effectStored = localStorage.getItem('sora_effect_enabled') === 'true';
+        document.getElementById('effect-toggle').checked = effectStored;
+        if(effectStored) toggleEffect(true);
+
+        const savedOp = localStorage.getItem('sora_window_opacity_v8');
+        if (savedOp !== null) { document.getElementById('opacity-slider').value = savedOp; updateOpacity(savedOp); } else { updateOpacity(10); }
 
         [4, 5].forEach(n => {
             const reel = document.querySelector(`#slot${n} .slot-reel`);
@@ -255,16 +410,14 @@
         });
     }
 
-    // ロジック関数群（継承）
-    function toggleBGPanel(e) { if(e) e.stopPropagation(); const p = document.getElementById('bg-panel'); p.style.display = (p.style.display === 'block') ? 'none' : 'block'; }
-    function closeBGPanel() { const p = document.getElementById('bg-panel'); if (p.style.display === 'block') p.style.display = 'none'; }
-    function selectPreset(id) { document.querySelectorAll('.dot').forEach(d => d.classList.remove('active-preset')); document.getElementById(id).classList.add('active-preset'); selectedPresetId = id; const img = localStorage.getItem('sora_img_preset_v7_'+id), col = localStorage.getItem('sora_preset_v7_'+id); if(img) applyBG(img); else if(col) applyBG(col); }
-    function saveToSelectedPreset() { if(!selectedPresetId) return alert("保存先の○をえらんでね！"); const dot = document.getElementById(selectedPresetId); if(currentBGValue.startsWith('data:image')){ dot.style.backgroundImage=`url(${currentBGValue})`; dot.style.backgroundSize='cover'; localStorage.setItem('sora_img_preset_v7_'+selectedPresetId, currentBGValue); } else { dot.style.backgroundImage='none'; dot.style.backgroundColor=currentBGValue; localStorage.setItem('sora_preset_v7_'+selectedPresetId, currentBGValue); } alert("保存したよ！"); }
-    function uploadBG(input) { if (input.files?.[0]) { const reader = new FileReader(); reader.onload = (e) => applyBG(e.target.result); reader.readAsDataURL(input.files[0]); } }
-    function updateSlotStyle(n) { const items = document.querySelectorAll(`#slot${n} .slot-item`); items.forEach((it, idx) => { it.className = (idx === slotState[n] + 1) ? 'slot-item active' : 'slot-item'; }); }
+    function updateSlotStyle(n) { document.querySelectorAll(`#slot${n} .slot-item`).forEach((it, idx) => { it.className = (idx === slotState[n] + 1) ? 'slot-item active' : 'slot-item'; }); }
     function quickSave(n, val) { data[`q${n}`] = val; setTimeout(next, ACTION_DELAY); }
     function save(n, val) { if(!val) return alert("入力してね！"); data[`q${n}`] = val; setTimeout(next, ACTION_DELAY); }
-    function saveSlot(n) { let val = document.getElementById(`q${n}_free`)?.value || options[n][slotState[n]]; if (n === 4) { const now = new Date(); val = `${val}(現在時刻:${now.getHours()}:${now.getMinutes()})`; } data[`q${n}`] = val; setTimeout(next, ACTION_DELAY); }
+    function saveSlot(n) { 
+        let val = document.getElementById(`q${n}_free`)?.value || options[n][slotState[n]]; 
+        if (n === 4) { const now = new Date(); val = `${val}(現在時刻:${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')})`; } 
+        data[`q${n}`] = val; setTimeout(next, ACTION_DELAY); 
+    }
     function toggleItem(el, val) { el.classList.toggle('selected'); const idx = q2_selected_chips.indexOf(val); if (idx > -1) q2_selected_chips.splice(idx, 1); else q2_selected_chips.push(val); }
     function nextMulti() { const free = document.getElementById('q2_free').value; data.q2 = [...q2_selected_chips]; if(free) data.q2.push(free); if(!data.q2.length) return alert("なにか選んでね！"); setTimeout(next, ACTION_DELAY); }
     function delayedNext() { setTimeout(next, ACTION_DELAY); }
@@ -274,35 +427,34 @@
         document.getElementById('viewport').style.transform = `translateX(-${step * 100}%)`; 
         document.getElementById('btn-back').style.display = step > 0 ? 'flex' : 'none'; 
         if(step === 9) { 
-            data.q8 = document.getElementById('q8').value || 'なし'; 
-            data.q9 = document.getElementById('q9').value || 'なし'; 
-            document.getElementById('summary').innerHTML = `<b>■構成：</b>${data.q1}<br><b>■目的：</b>${data.q2.join('・')}<br><b>■場所：</b>${data.q3}<br><b>■時間：</b>${data.q4}<br><b>■予算：</b>${data.q5}<br><b>■移動：</b>${data.q6}<br><b>■テーマ：</b>${data.q7}<br><b>■こだわり：</b>${data.q8}<br><b>■NG：</b>${data.q9}`; 
+            data.q8 = document.getElementById('q8').value || 'なし'; data.q9 = document.getElementById('q9').value || 'なし'; 
+            document.getElementById('summary').innerHTML = `<b>■構成：</b>${data.q1}<br><b>■目的：</b>${data.q2.join('・')}<br><b>■場所：</b>${data.q3}<br><b>■時間：</b>${data.q4}<br><b>■予算：</b>${data.q5}<br><b>■移動：</b>${data.q6}<br><b>■テーマ：</b>${data.q7}<br><b>■こだわり：</b>${data.q8}<br><b>■NG条件：</b>${data.q9}`; 
         } 
     }
-    async function getPreciseLocation(n) { 
+
+    async function getPreciseLocation(n) {
+        if (!navigator.geolocation) return alert("GPSが使えません");
         const btn = document.getElementById('gps-btn'); btn.innerText = "解析中...";
         navigator.geolocation.getCurrentPosition(async (pos) => {
-            data[`q${n}`] = `現在地(${pos.coords.latitude.toFixed(4)},${pos.coords.longitude.toFixed(4)})`;
-            btn.innerText = "完了！"; setTimeout(next, 500);
-        }, () => { alert("GPS失敗"); btn.innerText = "現在地"; });
+            const lat = pos.coords.latitude, lng = pos.coords.longitude;
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18`, { headers: { 'Accept-Language': 'ja' } });
+                const json = await res.json();
+                const a = json.address;
+                const addr = (a.province || "") + (a.city || a.town || "") + (a.suburb || a.city_district || "") + (a.road || "") + (a.house_number || "");
+                data[`q${n}`] = `現在地(${addr})`; btn.innerText = "完了！"; setTimeout(next, 500);
+            } catch (e) { data[`q${n}`] = `現在地(${lat.toFixed(4)},${lng.toFixed(4)})`; btn.innerText = "完了！"; setTimeout(next, 500); }
+        }, () => alert("位置情報を許可してね"), { enableHighAccuracy: true });
     }
+
     function openMap(n) { window.open("https://www.google.com/maps", "_blank"); }
     function finish() {
-        const text = `【注文票】\n■構成：${data.q1}\n■目的：${data.q2.join('・')}\n■場所：${data.q3}\n■時間：${data.q4}\n■予算：${data.q5}\n■移動：${data.q6}\n■テーマ：${data.q7}\n■こだわり：${data.q8}\n■NG：${data.q9}`;
+        const text = `【注文票】\n■構成：${data.q1}\n■目的：${data.q2.join('・')}\n■場所：${data.q3}\n■時間：${data.q4}\n■予算：${data.q5}\n■移動：${data.q6}\n■テーマ：${data.q7}\n■こだわり：${data.q8}\n■NG条件：${data.q9}`;
         navigator.clipboard.writeText(text).then(() => {
-            const btn = document.getElementById('btn-finish');
-            btn.innerText = "コピー完了！"; btn.style.background = "#67a38b";
-            setTimeout(() => { window.location.href = "https://gemini.google.com/"; }, 1000);
+            const btn = document.getElementById('btn-finish'); btn.innerText = "送信中..."; btn.classList.add('success');
+            setTimeout(() => { window.location.href = "https://gemini.google.com/"; }, 800);
         });
     }
-
-    // iOSスクロール制御
-    document.addEventListener('touchmove', (e) => {
-        if (!e.target.closest('.inventory-grid') && !e.target.closest('textarea') && !e.target.closest('#summary')) {
-            e.preventDefault();
-        }
-    }, { passive: false });
-
     initSlots();
 </script>
 </body>
