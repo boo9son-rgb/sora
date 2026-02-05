@@ -18,15 +18,17 @@
             --shadow: 0 8px 30px rgba(0,0,0,0.12);
         }
 
-        /* 修正箇所：全レイヤーで背景を固定 */
+        /* 修正箇所：html/bodyを画面よりわずかに大きく設定し、はみ出しで隙間を殺す */
         html, body { 
             margin: 0; padding: 0; 
-            height: 100%; width: 100%;
-            height: 100dvh;
+            height: 100.5%; width: 100%; /* 0.5%だけ大きく */
+            min-height: 101vh; /* 確実に画面下まで届かせる */
             font-family: 'DotGothic16', sans-serif; 
             color: var(--text-dark); 
             overflow: hidden; 
             position: fixed;
+            top: -2px; /* 上に少しずらして下をカバー */
+            left: 0;
             overscroll-behavior: none;
             background-size: cover;
             background-position: center center;
@@ -45,12 +47,14 @@
             user-select: text !important; 
         }
 
+        /* 背景レイヤーも上下に少し大きくしてズレを吸収 */
         .sky-bg { 
             position: fixed; 
-            top: 0; 
+            top: -10px; 
+            bottom: -10px;
             left: 0; 
             width: 100%; 
-            height: 100%; 
+            height: calc(100% + 20px); 
             z-index: -2; 
             background-color: transparent;
             background-size: cover;
@@ -115,8 +119,9 @@
             opacity: 0; cursor: pointer;
         }
 
-        .viewport { display: flex; height: 100%; transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1); }
-        .card { min-width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; }
+        /* メインコンテンツは100%のままに維持 */
+        .viewport { display: flex; height: 100dvh; width: 100%; transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1); position: relative; top: 2px; }
+        .card { min-width: 100%; height: 100dvh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; }
         
         .window { 
             background: var(--cloud-white); backdrop-filter: blur(12px); 
@@ -328,8 +333,8 @@
         requestAnimationFrame(animate);
     }
 
-    function toggleBGPanel(e) { 
-        if(e) e.stopPropagation(); 
+    function toggleBGPanel(event) { 
+        if(event) event.stopPropagation(); 
         const p = document.getElementById('bg-panel'); 
         p.style.display = (p.style.display === 'block') ? 'none' : 'block'; 
     }
@@ -339,7 +344,6 @@
         if (p.style.display === 'block') p.style.display = 'none';
     }
 
-    /* 修正箇所：applyBGでhtml, body, sky-bgのすべてに背景を強制同期 */
     function applyBG(val) { 
         if(!val) return; 
         currentBGValue = val;
