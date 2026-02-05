@@ -18,29 +18,29 @@
             --shadow: 0 8px 30px rgba(0,0,0,0.12);
         }
 
-        /* 修正箇所：OSレベルの「遊び」を背景色で同化させる */
+        /* 修正箇所：ビューポートと背景を物理的に画面の下端へ強制接着 */
         html {
-            height: 100%;
+            height: -webkit-fill-available;
             overflow: hidden;
-            background-color: var(--sky-blue); /* 余白ができてもこの色が漏れるようにする */
+            background-color: var(--sky-blue);
             position: fixed;
             width: 100%;
+            top: 0; left: 0; bottom: 0; right: 0;
         }
 
         body { 
             margin: 0; padding: 0; 
-            height: 100dvh; /* 動的ビューポート */
+            height: 100dvh; /* 動的ビューポートを優先 */
             width: 100vw;
             font-family: 'DotGothic16', sans-serif; 
             color: var(--text-dark); 
             overflow: hidden; 
             position: fixed; 
-            top: 0; left: 0;
-            overscroll-behavior-y: none; /* 下方向の引っ張りを禁止 */
+            top: 0; left: 0; bottom: 0 !important; /* 強制的に底辺へ */
+            overscroll-behavior: none;
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
-            background-attachment: fixed;
             background-color: var(--sky-blue);
         }
 
@@ -54,13 +54,13 @@
             user-select: text !important; 
         }
 
-        /* 背景レイヤー：最下部を超えて10%分余分に色を伸ばす（保険） */
+        /* 背景レイヤー：計算上の隙間を埋めるため下方向に20vh分突き抜けさせる */
         .sky-bg { 
             position: absolute; 
             top: 0; 
             left: 0; 
             width: 100%; 
-            height: 110%; 
+            height: 120vh; /* 画面より20%長くして下端の隙間を物理的に隠す */
             z-index: -2; 
             background-color: transparent;
             background-size: cover;
@@ -477,7 +477,7 @@
                 <b>■移動：</b>${data.q6}<br>
                 <b>■テーマ：</b>${data.q7}<br>
                 <b>■こだわり：</b>${data.q8}<br>
-                <b>■NG条件：</b>${data.q9}
+                <b>番外編・NG条件：</b>${data.q9}
             `; 
         } 
     }
