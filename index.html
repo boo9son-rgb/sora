@@ -16,6 +16,8 @@
             --accent-green: #67a38b;
             --text-dark: #4a5568;
             --shadow: 0 8px 30px rgba(0,0,0,0.12);
+            /* 透明度制御用の変数 */
+            --win-opacity: 0.9;
         }
 
         /* 修正箇所：htmlの背景を動的に書き換えるため、初期設定のみ維持 */
@@ -125,7 +127,9 @@
         .card { min-width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; }
         
         .window { 
-            background: var(--cloud-white); backdrop-filter: blur(12px); 
+            /* 背景色の不透明度を動的に変更 */
+            background: rgba(255, 255, 255, var(--win-opacity)); 
+            backdrop-filter: blur(12px); 
             border-radius: 20px; padding: 20px; width: 100%; max-width: 320px; 
             text-align: center; box-shadow: var(--shadow); border: 1px solid rgba(255, 255, 255, 0.6); 
             height: 360px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;
@@ -138,7 +142,9 @@
         .inventory-grid::-webkit-scrollbar { display: none; }
 
         .item-chip { 
-            background: white; border: 1px solid #ddd; border-radius: 10px; 
+            /* ボタンの背景色の不透明度を動的に変更、ただし枠線と影は維持 */
+            background: rgba(255, 255, 255, var(--win-opacity)); 
+            border: 1px solid #ddd; border-radius: 10px; 
             padding: 4px 6px; font-size: 0.85rem; cursor: pointer; 
             box-shadow: 0 4px 0 #ccc; display: flex; align-items: center; justify-content: center; min-height: 44px; position: relative;
         }
@@ -155,7 +161,7 @@
         .btn-main:active { transform: translateY(4px); box-shadow: 0 0 0 #222; }
 
         .free-input-wrapper { display: flex; gap: 8px; width: 100%; margin-top: 8px; }
-        .free-input, textarea { width: 100%; border: 1px solid #ddd; border-radius: 10px; padding: 10px; font-family: inherit; box-sizing: border-box; font-size: 0.85rem; outline: none; }
+        .free-input, textarea { width: 100%; border: 1px solid #ddd; border-radius: 10px; padding: 10px; font-family: inherit; box-sizing: border-box; font-size: 0.85rem; outline: none; background: rgba(255,255,255, var(--win-opacity)); }
         
         .btn-dot-ok { 
             width: 44px; height: 44px; background: var(--accent-green); color: white; 
@@ -174,6 +180,13 @@
         #summary { font-size:0.8rem; text-align:left; background:rgba(0,0,0,0.05); padding:12px; border-radius:10px; overflow-y:auto; flex:1; margin-bottom:5px; line-height:1.5; }
 
         .btn-main.success { background: var(--accent-green) !important; box-shadow: 0 4px 0 #4a7a66 !important; }
+
+        /* スライダーのスタイル */
+        .opacity-slider-row {
+            background: rgba(0,0,0,0.05); padding: 8px; border-radius: 10px; margin-bottom: 8px;
+            font-size: 0.75rem; display: flex; flex-direction: column; gap: 5px;
+        }
+        .opacity-slider { width: 100%; cursor: pointer; height: 20px; accent-color: var(--text-dark); }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -184,6 +197,11 @@
 
 <div class="bg-settings">
     <div class="bg-panel" id="bg-panel">
+        <div class="opacity-slider-row">
+            <div style="display:flex; justify-content:space-between"><span>まどの透明度</span><span id="opacity-val">0%</span></div>
+            <input type="range" class="opacity-slider" id="opacity-range" min="0" max="100" value="0" oninput="changeWinOpacity(this.value)">
+        </div>
+
         <div class="color-dots">
             <div class="dot" style="background-color: #a3c1da;" onpointerup="applyBG('default')"></div>
             <div id="p1" class="dot" onpointerup="selectPreset('p1')"></div>
@@ -228,7 +246,7 @@
 
 <script>
     document.addEventListener('touchmove', function(e) {
-        if (!e.target.closest('.inventory-grid') && !e.target.closest('textarea') && !e.target.closest('#summary')) {
+        if (!e.target.closest('.inventory-grid') && !e.target.closest('textarea') && !e.target.closest('#summary') && !e.target.closest('.opacity-slider')) {
             e.preventDefault();
         }
     }, { passive: false });
@@ -360,7 +378,6 @@
         } else if (val.startsWith('data:image')) { 
             bg.style.backgroundImage = `url(${val})`;
             bg.style.backgroundColor = 'transparent';
-            // 画像の時、htmlの背景色は黒か画像に馴染む色にする
             html.style.backgroundColor = 'rgba(0,0,0,0.9)'; 
         } else { 
             bg.style.backgroundImage = 'none';
@@ -404,7 +421,6 @@
         alert("ここに上書き保存したよ！");
     }
 
-    /* 修正箇所：アップロード後、applyBG関数を呼んで全体（html背景含む）を更新 */
     function uploadBG(input) { 
         if (input.files?.[0]) { 
             const reader = new FileReader(); 
@@ -438,6 +454,11 @@
             reel.addEventListener('touchend', () => { slotState[n] = Math.max(0, Math.min(options[n].length - 1, slotState[n] - Math.round(moveY / 40))); reel.style.transform = `translateY(-${slotState[n] * 40}px)`; updateSlotStyle(n); moveY = 0; });
             updateSlotStyle(n);
         });
+
+        // 透明度の復元
+        const savedOpacity = localStorage.getItem('sora_win_opacity') || 0;
+        document.getElementById('opacity-range').value = savedOpacity;
+        changeWinOpacity(savedOpacity);
     }
 
     function updateSlotStyle(n) { const items = document.querySelectorAll(`#slot${n} .slot-item`); items.forEach((it, idx) => { it.className = (idx === slotState[n] + 1) ? 'slot-item active' : 'slot-item'; }); }
@@ -532,6 +553,15 @@
             setTimeout(() => { window.location.href = "https://gemini.google.com/"; }, ACTION_DELAY + 500);
         });
     }
+
+    // 透明度変更処理の追加
+    function changeWinOpacity(val) {
+        const opacity = (100 - val) / 100 * 0.9; // 0%の時に0.9(元の状態)、100%で0
+        document.documentElement.style.setProperty('--win-opacity', opacity);
+        document.getElementById('opacity-val').innerText = val + "%";
+        localStorage.setItem('sora_win_opacity', val);
+    }
+
     initSlots();
 </script>
 </body>
