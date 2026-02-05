@@ -40,17 +40,18 @@
             user-select: text !important; 
         }
 
+        /* 修正箇所：背景画像が下部まで確実に埋まるように調整 */
         .sky-bg { 
             position: fixed; 
             top: 0; 
             left: 0; 
-            width: 100vw; 
-            height: 100dvh; 
+            width: 100%; 
+            height: 100dvh; /* dvhを使用して操作バーを含めた全画面に対応 */
             z-index: -2; 
             background-color: transparent;
-            /* 追加: 画像が切れないようにする */
             background-size: cover;
             background-position: center;
+            background-repeat: no-repeat;
         }
 
         #effect-canvas {
@@ -62,7 +63,7 @@
         .bg-btn { width: 44px; height: 44px; border: none; background: none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.1s; font-family: inherit; display: flex; align-items: center; justify-content: center; }
         .bg-btn:active { transform: translateY(4px); text-shadow: 0 0 0 rgba(0,0,0,0); }
 
-        .btn-back { position: fixed; bottom: 20px; left: 15px; border: none; background: none; width: 44px; height: 44px; z-index: 1011; display:none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); font-family: inherit; align-items: center; justify-content: center; transition: transform 0.1s; }
+        .btn-back { position: fixed; bottom: 20px; left: 15px; border: none; background: none; width: 44px; height: 44px; z-index: 1001; display:none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); font-family: inherit; align-items: center; justify-content: center; transition: transform 0.1s; }
         .btn-back:active { transform: translateY(4px); text-shadow: 0 0 0 rgba(0,0,0,0); }
         
         .bg-panel { 
@@ -344,7 +345,7 @@
             bg.style.backgroundImage = 'none'; 
             currentBGValue = '#a3c1da';
         } else if (val.startsWith('data:image')) { 
-            // 修正箇所: 画像の時はbgコンテナにセットし、bodyの色も画像と同系にするか透明化
+            // 修正箇所：画像適用時に背景レイヤーを全画面固定し、body色も透明化
             bg.style.backgroundImage = `url(${val})`; 
             document.body.style.backgroundColor = 'transparent';
             document.documentElement.style.backgroundColor = 'transparent';
