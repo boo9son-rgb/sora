@@ -25,14 +25,12 @@
 
         body, html { 
             margin: 0; padding: 0; 
-            width: 100vw;
-            height: 100vh;
-            height: -webkit-fill-available;
+            height: 100%; width: 100%;
+            height: 100dvh;
             font-family: 'DotGothic16', sans-serif; 
             color: var(--text-dark); 
             overflow: hidden; 
             position: fixed;
-            top: 0; left: 0;
             overscroll-behavior: none;
             background-color: var(--sky-blue);
         }
@@ -42,19 +40,17 @@
             user-select: text !important; 
         }
 
-        /* 修正箇所: 画像背景がiPhoneのツールバーで伸縮・ズレないよう、ビューポート基準で固定 */
         .sky-bg { 
             position: fixed; 
-            top: 0; left: 0; 
+            top: 0; 
+            left: 0; 
             width: 100vw; 
-            height: 100vh; /* ブラウザバーを含めた全領域 */
-            height: -webkit-fill-available; 
+            height: 100dvh; 
             z-index: -2; 
             background-color: transparent;
-            /* 画像が設定された際の挙動を改善 */
-            background-attachment: scroll; 
+            /* 追加: 画像が切れないようにする */
             background-size: cover;
-            background-position: center center;
+            background-position: center;
         }
 
         #effect-canvas {
@@ -62,11 +58,11 @@
             z-index: -1; pointer-events: none;
         }
 
-        .bg-settings { position: fixed; bottom: 20px; right: 20px; z-index: 10000; margin-bottom: env(safe-area-inset-bottom); }
+        .bg-settings { position: fixed; bottom: 20px; right: 20px; z-index: 10000; }
         .bg-btn { width: 44px; height: 44px; border: none; background: none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.1s; font-family: inherit; display: flex; align-items: center; justify-content: center; }
         .bg-btn:active { transform: translateY(4px); text-shadow: 0 0 0 rgba(0,0,0,0); }
 
-        .btn-back { position: fixed; bottom: 20px; left: 15px; border: none; background: none; width: 44px; height: 44px; z-index: 1001; display:none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); font-family: inherit; align-items: center; justify-content: center; transition: transform 0.1s; margin-bottom: env(safe-area-inset-bottom); }
+        .btn-back { position: fixed; bottom: 20px; left: 15px; border: none; background: none; width: 44px; height: 44px; z-index: 1011; display:none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); font-family: inherit; align-items: center; justify-content: center; transition: transform 0.1s; }
         .btn-back:active { transform: translateY(4px); text-shadow: 0 0 0 rgba(0,0,0,0); }
         
         .bg-panel { 
@@ -122,7 +118,7 @@
             border-radius: 20px; padding: 20px; width: 100%; max-width: 320px; 
             text-align: center; box-shadow: var(--shadow); border: 1px solid rgba(255, 255, 255, 0.6); 
             height: 360px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;
-            padding-top: calc(20px + env(safe-area-inset-top)); 
+            margin-top: env(safe-area-inset-top);
         }
 
         h2 { font-size: 1.0rem; margin-top: 0; margin-bottom: 10px; }
@@ -221,7 +217,7 @@
 
 <script>
     document.addEventListener('touchmove', function(e) {
-        if (!e.target.closest('.inventory-grid') && !e.target.closest('textarea') && !e.target.closest('#summary') && !e.target.closest('.slot-container')) {
+        if (!e.target.closest('.inventory-grid') && !e.target.closest('textarea') && !e.target.closest('#summary')) {
             e.preventDefault();
         }
     }, { passive: false });
@@ -338,7 +334,6 @@
         if (p.style.display === 'block') p.style.display = 'none';
     }
 
-    /* 修正箇所: 画像背景の適用方法を改善 */
     function applyBG(val) { 
         if(!val) return; 
         currentBGValue = val;
@@ -349,10 +344,10 @@
             bg.style.backgroundImage = 'none'; 
             currentBGValue = '#a3c1da';
         } else if (val.startsWith('data:image')) { 
-            // 画像の場合は背景色を一旦リセットして画像に集中させる
-            bg.style.background = `url(${val}) center center / cover no-repeat fixed`; 
-            // iOS Safariの固定背景バグ対策として、別途backgroundColorも設定しておく
+            // 修正箇所: 画像の時はbgコンテナにセットし、bodyの色も画像と同系にするか透明化
+            bg.style.backgroundImage = `url(${val})`; 
             document.body.style.backgroundColor = 'transparent';
+            document.documentElement.style.backgroundColor = 'transparent';
         } else { 
             document.body.style.backgroundColor = val;
             document.documentElement.style.backgroundColor = val;
