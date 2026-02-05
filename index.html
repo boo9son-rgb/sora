@@ -21,7 +21,6 @@
         * { 
             -webkit-tap-highlight-color: transparent; 
             touch-action: pan-x pan-y;
-            box-sizing: border-box;
         }
 
         body, html { 
@@ -32,6 +31,7 @@
             color: var(--text-dark); 
             overflow: hidden; 
             position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
             overscroll-behavior: none;
             background-color: var(--sky-blue);
         }
@@ -42,7 +42,7 @@
         }
 
         .sky-bg { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; 
             z-index: -2; 
             background-color: transparent;
         }
@@ -52,13 +52,11 @@
             z-index: -1; pointer-events: none;
         }
 
-        /* 修正箇所：iPhoneの浮き上がりを抑えるため、ベースを10pxに下げ、セーフエリアを付与 */
-        .bg-settings { position: fixed; bottom: calc(10px + env(safe-area-inset-bottom)); right: 20px; z-index: 10000; }
+        .bg-settings { position: fixed; bottom: 20px; right: 20px; z-index: 10000; margin-bottom: env(safe-area-inset-bottom); }
         .bg-btn { width: 44px; height: 44px; border: none; background: none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.1s; font-family: inherit; display: flex; align-items: center; justify-content: center; }
         .bg-btn:active { transform: translateY(4px); text-shadow: 0 0 0 rgba(0,0,0,0); }
 
-        /* 修正箇所：こちらも同様にベースを10pxに下げ、横位置を調整 */
-        .btn-back { position: fixed; bottom: calc(10px + env(safe-area-inset-bottom)); left: 15px; border: none; background: none; width: 44px; height: 44px; z-index: 1001; display:none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); font-family: inherit; align-items: center; justify-content: center; transition: transform 0.1s; }
+        .btn-back { position: fixed; bottom: 20px; left: 15px; border: none; background: none; width: 44px; height: 44px; z-index: 1001; display:none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); font-family: inherit; align-items: center; justify-content: center; transition: transform 0.1s; margin-bottom: env(safe-area-inset-bottom); }
         .btn-back:active { transform: translateY(4px); text-shadow: 0 0 0 rgba(0,0,0,0); }
         
         .bg-panel { 
@@ -107,19 +105,14 @@
         }
 
         .viewport { display: flex; height: 100%; transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1); }
-        .card { 
-            min-width: 100%; height: 100%; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; 
-            padding: calc(10px + env(safe-area-inset-top)) 15px calc(10px + env(safe-area-inset-bottom)) 15px; 
-            box-sizing: border-box; 
-        }
+        .card { min-width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; }
         
         .window { 
             background: var(--cloud-white); backdrop-filter: blur(12px); 
             border-radius: 20px; padding: 20px; width: 100%; max-width: 320px; 
             text-align: center; box-shadow: var(--shadow); border: 1px solid rgba(255, 255, 255, 0.6); 
-            height: 380px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;
-            position: relative;
+            height: 360px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;
+            margin-top: env(safe-area-inset-top);
         }
 
         h2 { font-size: 1.0rem; margin-top: 0; margin-bottom: 10px; }
