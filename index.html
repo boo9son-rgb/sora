@@ -23,15 +23,17 @@
             touch-action: pan-x pan-y;
         }
 
+        /* 修正箇所: iPhoneの高さ問題を強制リセット */
         body, html { 
             margin: 0; padding: 0; 
-            height: 100%; width: 100%;
-            height: 100dvh;
+            width: 100vw;
+            height: 100vh; /* フォールバック */
+            height: -webkit-fill-available; /* iOS用の特殊な高さ指定 */
             font-family: 'DotGothic16', sans-serif; 
             color: var(--text-dark); 
             overflow: hidden; 
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0; left: 0;
             overscroll-behavior: none;
             background-color: var(--sky-blue);
         }
@@ -41,8 +43,11 @@
             user-select: text !important; 
         }
 
+        /* 修正箇所: 背景を画面いっぱいに強制 */
         .sky-bg { 
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; 
+            position: fixed; 
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100%; 
             z-index: -2; 
             background-color: transparent;
         }
@@ -112,7 +117,8 @@
             border-radius: 20px; padding: 20px; width: 100%; max-width: 320px; 
             text-align: center; box-shadow: var(--shadow); border: 1px solid rgba(255, 255, 255, 0.6); 
             height: 360px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;
-            margin-top: env(safe-area-inset-top);
+            /* 修正箇所: 見切れるのを防ぐためにenvをpadding-topに変更 */
+            padding-top: calc(20px + env(safe-area-inset-top)); 
         }
 
         h2 { font-size: 1.0rem; margin-top: 0; margin-bottom: 10px; }
@@ -210,8 +216,9 @@
 </div>
 
 <script>
+    /* 修正箇所: スクロール無効化の範囲を限定 */
     document.addEventListener('touchmove', function(e) {
-        if (!e.target.closest('.inventory-grid') && !e.target.closest('textarea') && !e.target.closest('#summary')) {
+        if (!e.target.closest('.inventory-grid') && !e.target.closest('textarea') && !e.target.closest('#summary') && !e.target.closest('.slot-container')) {
             e.preventDefault();
         }
     }, { passive: false });
