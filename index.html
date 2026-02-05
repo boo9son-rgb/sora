@@ -29,6 +29,7 @@
         body, html { 
             margin: 0; padding: 0; 
             height: 100%; width: 100%;
+            /* iOS Safariの高さズレ対策 */
             height: 100dvh;
             font-family: 'DotGothic16', sans-serif; 
             color: var(--text-dark); 
@@ -44,10 +45,13 @@
             user-select: text !important; 
         }
 
+        /* 背景画像を全体に表示する修正 */
         .sky-bg { 
             position: fixed; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%;
+            top: 0;
+            left: 0; 
+            width: 100%; 
+            height: 100%;
             z-index: -2; 
             background-color: transparent;
             pointer-events: none;
@@ -123,16 +127,14 @@
         
         .window { 
             background: rgba(255, 255, 255, var(--window-opacity));
-            backdrop-filter: blur(calc(var(--window-opacity) * 10px)); 
-            border-radius: 24px; padding: 20px; width: 100%; max-width: 320px; 
-            text-align: center; box-shadow: var(--shadow); 
-            border: 1px solid rgba(255, 255, 255, calc(var(--window-opacity) + 0.1)); 
+            backdrop-filter: blur(12px); 
+            border-radius: 20px; padding: 20px; width: 100%; max-width: 320px; 
+            text-align: center; box-shadow: var(--shadow); border: 1px solid rgba(255, 255, 255, 0.6); 
             height: 380px; 
             display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;
+            /* iPhoneのノッチ対策 */
             margin-top: calc(env(safe-area-inset-top) / 2);
-            text-shadow: var(--dynamic-text-shadow); 
-            color: var(--text-dark);
-            transition: background 0.3s ease, border 0.3s ease;
+            text-shadow: var(--dynamic-text-shadow);
         }
 
         h2 { font-size: 1.0rem; margin-top: 0; margin-bottom: 10px; }
@@ -141,15 +143,10 @@
         .inventory-grid::-webkit-scrollbar { display: none; }
 
         .item-chip { 
-            background: rgba(255, 255, 255, calc(var(--window-opacity) * 0.5 + 0.1)); 
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.3); 
-            border-radius: 12px; 
+            background: white; border: 1px solid #ddd; border-radius: 10px; 
             padding: 4px 6px; font-size: 0.85rem; cursor: pointer; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05), 0 4px 0 rgba(0,0,0,0.1); 
-            display: flex; align-items: center; justify-content: center; min-height: 44px; position: relative;
-            text-shadow: inherit;
-            transition: transform 0.1s, background 0.3s;
+            box-shadow: 0 4px 0 #ccc; display: flex; align-items: center; justify-content: center; min-height: 44px; position: relative;
+            text-shadow: none;
         }
         .item-chip:active { transform: translateY(4px); box-shadow: 0 0 0 #ccc; background: var(--accent-orange); color: white; border-color: transparent; }
         .item-chip.selected { background: var(--accent-orange); color: white; border-color: transparent; box-shadow: 0 4px 0 #d47e4d; }
@@ -160,23 +157,11 @@
         .slot-item.active { color: var(--text-dark); font-weight: bold; font-size: 1.1rem; }
         .slot-overlay { position: absolute; top: 40px; left: 0; width: 100%; height: 40px; pointer-events: none; border-top: 1px solid rgba(0,0,0,0.1); border-bottom: 1px solid rgba(0,0,0,0.1); background: rgba(0, 0, 0, 0.03); }
 
-        .btn-main { 
-            width: 100%; margin-top: 10px; padding: 12px; 
-            background: rgba(74, 85, 104, calc(var(--window-opacity) * 0.8 + 0.2));
-            backdrop-filter: blur(4px);
-            color: white; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; font-family: inherit; font-size: 0.9rem; 
-            box-shadow: 0 4px 0 rgba(34, 34, 34, 0.4); 
-            cursor: pointer; position: relative; transition: transform 0.05s; 
-            text-shadow: inherit; 
-        }
+        .btn-main { width: 100%; margin-top: 10px; padding: 12px; background: var(--text-dark) ; color: white; border: none; border-radius: 10px; font-family: inherit; font-size: 0.9rem; box-shadow: 0 4px 0 #222; cursor: pointer; position: relative; transition: transform 0.05s; text-shadow: none; }
         .btn-main:active { transform: translateY(4px); box-shadow: 0 0 0 #222; }
 
         .free-input-wrapper { display: flex; gap: 8px; width: 100%; margin-top: 8px; text-shadow: none; }
-        .free-input, textarea { 
-            width: 100%; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 12px; padding: 10px; font-family: inherit; 
-            box-sizing: border-box; font-size: 0.85rem; outline: none; text-shadow: none; 
-            background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px);
-        }
+        .free-input, textarea { width: 100%; border: 1px solid #ddd; border-radius: 10px; padding: 10px; font-family: inherit; box-sizing: border-box; font-size: 0.85rem; outline: none; text-shadow: none; }
         
         .btn-dot-ok { 
             width: 44px; height: 44px; background: var(--accent-green); color: white; 
@@ -192,7 +177,7 @@
         }
 
         textarea { height: 80px; resize: none; margin-top: 8px; }
-        #summary { font-size:0.8rem; text-align:left; background:rgba(255,255,255,0.2); padding:12px; border-radius:12px; overflow-y:auto; flex:1; margin-bottom:5px; line-height:1.5; text-shadow: inherit; border: 1px solid rgba(255,255,255,0.2); }
+        #summary { font-size:0.8rem; text-align:left; background:rgba(0,0,0,0.05); padding:12px; border-radius:10px; overflow-y:auto; flex:1; margin-bottom:5px; line-height:1.5; text-shadow: none; }
 
         .btn-main.success { background: var(--accent-green) !important; box-shadow: 0 4px 0 #4a7a66 !important; }
     </style>
@@ -253,6 +238,7 @@
 </div>
 
 <script>
+    // iOSのスクロールバウンス防止
     document.addEventListener('touchmove', function(e) {
         if (!e.target.closest('.inventory-grid') && !e.target.closest('textarea') && !e.target.closest('#summary')) {
             e.preventDefault();
@@ -374,22 +360,9 @@
     function updateOpacity(val) {
         const opacity = val / 100;
         const root = document.documentElement;
-        // ウィンドウ全体の透明度を設定
         root.style.setProperty('--window-opacity', opacity);
-        
-        // 透明度が低いほど文字の縁取りを強化
-        const shadowIntensity = (1 - opacity).toFixed(2);
-        const shadowColor = `rgba(0,0,0, ${shadowIntensity * 0.85})`;
-        
-        if (opacity < 0.7) {
-            // 背景が透けるほど多重縁取りで文字を守る
-            root.style.setProperty('--dynamic-text-shadow', 
-                `1px 1px 0 ${shadowColor}, -1px -1px 0 ${shadowColor}, 1px -1px 0 ${shadowColor}, -1px 1px 0 ${shadowColor}, 2px 2px 4px rgba(0,0,0,0.4)`);
-            root.style.setProperty('--text-dark', opacity < 0.3 ? '#000' : '#333');
-        } else {
-            root.style.setProperty('--dynamic-text-shadow', '0 0 0 rgba(0,0,0,0)');
-            root.style.setProperty('--text-dark', '#4a5568');
-        }
+        const shadowAlpha = (100 - val) / 100 * 0.8; 
+        root.style.setProperty('--dynamic-text-shadow', `1px 1px 3px rgba(0,0,0,${shadowAlpha})`);
         localStorage.setItem('sora_window_opacity', val);
     }
 
@@ -403,7 +376,7 @@
             bg.style.backgroundImage = 'none'; 
             currentBGValue = '#a3c1da';
         } else if (val.startsWith('data:image')) { 
-            bg.style.background = `url(${val}) center / cover no-repeat scroll`; 
+            bg.style.background = `url(${val}) center / cover no-repeat fixed`; 
         } else { 
             document.body.style.backgroundColor = val;
             document.documentElement.style.backgroundColor = val;
