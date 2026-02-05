@@ -21,16 +21,18 @@
         * { 
             -webkit-tap-highlight-color: transparent; 
             touch-action: pan-x pan-y;
+            box-sizing: border-box;
         }
 
         body, html { 
             margin: 0; padding: 0; 
             height: 100%; width: 100%;
-            height: 100dvh;
+            height: 100dvh; /* iOSのツールバーを考慮した高さ */
             font-family: 'DotGothic16', sans-serif; 
             color: var(--text-dark); 
             overflow: hidden; 
             position: fixed;
+            top: 0; left: 0;
             overscroll-behavior: none;
             background-color: var(--sky-blue);
         }
@@ -40,10 +42,14 @@
             user-select: text !important; 
         }
 
+        /* 画像全画面表示の修正 */
         .sky-bg { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             z-index: -2; 
             background-color: transparent;
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
         }
 
         #effect-canvas {
@@ -51,11 +57,11 @@
             z-index: -1; pointer-events: none;
         }
 
-        .bg-settings { position: fixed; bottom: 20px; right: 20px; z-index: 10000; }
+        .bg-settings { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); right: 20px; z-index: 10000; }
         .bg-btn { width: 44px; height: 44px; border: none; background: none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.1s; font-family: inherit; display: flex; align-items: center; justify-content: center; }
         .bg-btn:active { transform: translateY(4px); text-shadow: 0 0 0 rgba(0,0,0,0); }
 
-        .btn-back { position: fixed; bottom: 20px; left: 15px; border: none; background: none; width: 44px; height: 44px; z-index: 1001; display:none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); font-family: inherit; align-items: center; justify-content: center; transition: transform 0.1s; }
+        .btn-back { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 15px; border: none; background: none; width: 44px; height: 44px; z-index: 1001; display:none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); font-family: inherit; align-items: center; justify-content: center; transition: transform 0.1s; }
         .btn-back:active { transform: translateY(4px); text-shadow: 0 0 0 rgba(0,0,0,0); }
         
         .bg-panel { 
@@ -68,6 +74,7 @@
         .dot { 
             width: 34px; height: 34px; border-radius: 50%; cursor: pointer; 
             border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            background-size: cover; background-position: center;
         }
         .dot.active-preset { border-color: var(--accent-orange); box-shadow: 0 0 8px var(--accent-orange); }
 
@@ -110,7 +117,8 @@
             background: var(--cloud-white); backdrop-filter: blur(12px); 
             border-radius: 20px; padding: 20px; width: 100%; max-width: 320px; 
             text-align: center; box-shadow: var(--shadow); border: 1px solid rgba(255, 255, 255, 0.6); 
-            height: 360px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;
+            height: 380px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;
+            /* iPhoneのノッチ対策 */
             margin-top: env(safe-area-inset-top);
         }
 
@@ -337,7 +345,7 @@
             bg.style.backgroundImage = 'none'; 
             currentBGValue = '#a3c1da';
         } else if (val.startsWith('data:image')) { 
-            bg.style.background = `url(${val}) center / cover no-repeat fixed`; 
+            bg.style.backgroundImage = `url(${val})`; 
         } else { 
             document.body.style.backgroundColor = val;
             document.documentElement.style.backgroundColor = val;
@@ -362,13 +370,11 @@
     function saveToSelectedPreset() {
         if (!selectedPresetId) return alert("保存先の○をえらんでね！");
         
-        // Pixel対応: 保存時に確実に現在の状態を確定させる
         const dot = document.getElementById(selectedPresetId);
         const currentToSave = currentBGValue;
 
         if (currentToSave.startsWith('data:image')) {
             dot.style.backgroundImage = `url(${currentToSave})`;
-            dot.style.backgroundSize = 'cover';
             dot.style.backgroundColor = 'transparent';
             localStorage.setItem('sora_img_preset_v7_' + selectedPresetId, currentToSave);
             localStorage.removeItem('sora_preset_v7_' + selectedPresetId);
@@ -388,7 +394,7 @@
             const savedColor = localStorage.getItem('sora_preset_v7_' + id); 
             const savedImage = localStorage.getItem('sora_img_preset_v7_' + id);
             const dot = document.getElementById(id);
-            if(savedImage) { dot.style.backgroundImage = `url(${savedImage})`; dot.style.backgroundSize = 'cover'; }
+            if(savedImage) { dot.style.backgroundImage = `url(${savedImage})`; }
             else if(savedColor) { dot.style.backgroundColor = savedColor; }
         }); 
         const savedBG = localStorage.getItem('sora_bg_v7_solid'); 
@@ -504,4 +510,3 @@
 </script>
 </body>
 </html>
-
