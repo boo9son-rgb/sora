@@ -1,170 +1,167 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>SORA - Pixel Sky Hybrid</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
-        
-        :root { 
-            --sky-blue: #a3c1da; 
-            --cloud-white: rgba(255, 255, 255, 0.9); 
-            --accent-orange: #ff9e67; 
-            --accent-green: #67a38b;
-            --text-dark: #4a5568;
-            --shadow: 0 8px 30px rgba(0,0,0,0.12);
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>SORA - Pixel Sky Hybrid</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
+        
+        :root { 
+            --sky-blue: #a3c1da; 
+            --cloud-white: rgba(255, 255, 255, 0.9); 
+            --accent-orange: #ff9e67; 
+            --accent-green: #67a38b;
+            --text-dark: #4a5568;
+            --shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
 
-        * { 
-            -webkit-tap-highlight-color: transparent; 
-            touch-action: pan-x pan-y;
-            box-sizing: border-box;
-        }
+        * { 
+            -webkit-tap-highlight-color: transparent; 
+            touch-action: pan-x pan-y;
+        }
 
-        body, html { 
-            margin: 0; padding: 0; 
-            height: 100%; width: 100%;
-            height: 100dvh; /* iOSのツールバーを考慮した高さ */
-            font-family: 'DotGothic16', sans-serif; 
-            color: var(--text-dark); 
-            overflow: hidden; 
-            position: fixed;
+        body, html { 
+            margin: 0; padding: 0; 
+            height: 100%; width: 100%;
+            height: 100dvh;
+            font-family: 'DotGothic16', sans-serif; 
+            color: var(--text-dark); 
+            overflow: hidden; 
+            position: fixed;
             top: 0; left: 0;
-            overscroll-behavior: none;
-            background-color: var(--sky-blue);
-        }
+            overscroll-behavior: none;
+            background-color: var(--sky-blue);
+        }
 
-        input, textarea { 
-            -webkit-user-select: text !important; 
-            user-select: text !important; 
-        }
+        input, textarea { 
+            -webkit-user-select: text !important; 
+            user-select: text !important; 
+        }
 
-        /* 画像全画面表示の修正 */
-        .sky-bg { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            z-index: -2; 
-            background-color: transparent;
-            background-position: center;
+        .sky-bg { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            z-index: -2; 
+            background-color: transparent;
             background-size: cover;
+            background-position: center;
             background-repeat: no-repeat;
-        }
+        }
 
-        #effect-canvas {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1; pointer-events: none;
-        }
+        #effect-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; pointer-events: none;
+        }
 
-        .bg-settings { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); right: 20px; z-index: 10000; }
-        .bg-btn { width: 44px; height: 44px; border: none; background: none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.1s; font-family: inherit; display: flex; align-items: center; justify-content: center; }
-        .bg-btn:active { transform: translateY(4px); text-shadow: 0 0 0 rgba(0,0,0,0); }
+        .bg-settings { position: fixed; bottom: 20px; right: 20px; z-index: 10000; }
+        .bg-btn { width: 44px; height: 44px; border: none; background: none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.1s; font-family: inherit; display: flex; align-items: center; justify-content: center; }
+        .bg-btn:active { transform: translateY(4px); text-shadow: 0 0 0 rgba(0,0,0,0); }
 
-        .btn-back { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 15px; border: none; background: none; width: 44px; height: 44px; z-index: 1001; display:none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); font-family: inherit; align-items: center; justify-content: center; transition: transform 0.1s; }
-        .btn-back:active { transform: translateY(4px); text-shadow: 0 0 0 rgba(0,0,0,0); }
-        
-        .bg-panel { 
-            position: absolute; bottom: 60px; right: 0; background: var(--cloud-white); 
-            padding: 15px; border-radius: 15px; box-shadow: var(--shadow); 
-            display: none; backdrop-filter: blur(10px); width: 210px; border: 1px solid white; 
-        }
+        .btn-back { position: fixed; bottom: 20px; left: 15px; border: none; background: none; width: 44px; height: 44px; z-index: 1001; display:none; cursor: pointer; font-size: 2.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); font-family: inherit; align-items: center; justify-content: center; transition: transform 0.1s; }
+        .btn-back:active { transform: translateY(4px); text-shadow: 0 0 0 rgba(0,0,0,0); }
+        
+        .bg-panel { 
+            position: absolute; bottom: 60px; right: 0; background: var(--cloud-white); 
+            padding: 15px; border-radius: 15px; box-shadow: var(--shadow); 
+            display: none; backdrop-filter: blur(10px); width: 210px; border: 1px solid white; 
+        }
 
-        .color-dots { display: flex; gap: 8px; justify-content: center; margin-bottom: 10px; flex-wrap: wrap; }
-        .dot { 
-            width: 34px; height: 34px; border-radius: 50%; cursor: pointer; 
-            border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+        .color-dots { display: flex; gap: 8px; justify-content: center; margin-bottom: 10px; flex-wrap: wrap; }
+        .dot { 
+            width: 34px; height: 34px; border-radius: 50%; cursor: pointer; 
+            border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             background-size: cover; background-position: center;
-        }
-        .dot.active-preset { border-color: var(--accent-orange); box-shadow: 0 0 8px var(--accent-orange); }
+        }
+        .dot.active-preset { border-color: var(--accent-orange); box-shadow: 0 0 8px var(--accent-orange); }
 
-        .custom-color-wrapper { display: flex; flex-direction: column; gap: 8px; }
-        .btn-row { display: flex; gap: 5px; width: 100%; }
-        
-        .btn-panel-item { 
-            flex: 1; padding: 8px; font-size: 0.75rem; border-radius: 10px; 
-            font-family: inherit; cursor: pointer; display: flex; align-items: center; 
-            justify-content: center; position: relative; border: 1px solid #ddd;
-            box-shadow: 0 4px 0 #ccc; background: white; transition: transform 0.05s;
-        }
-        .btn-panel-item:active { transform: translateY(4px); box-shadow: 0 0 0 #ccc; }
+        .custom-color-wrapper { display: flex; flex-direction: column; gap: 8px; }
+        .btn-row { display: flex; gap: 5px; width: 100%; }
+        
+        .btn-panel-item { 
+            flex: 1; padding: 8px; font-size: 0.75rem; border-radius: 10px; 
+            font-family: inherit; cursor: pointer; display: flex; align-items: center; 
+            justify-content: center; position: relative; border: 1px solid #ddd;
+            box-shadow: 0 4px 0 #ccc; background: white; transition: transform 0.05s;
+        }
+        .btn-panel-item:active { transform: translateY(4px); box-shadow: 0 0 0 #ccc; }
 
-        .btn-panel-dark {
-            background: var(--text-dark) !important;
-            color: white !important;
-            border-color: transparent !important;
-            box-shadow: 0 4px 0 #222 !important;
-        }
-        .btn-panel-dark:active { box-shadow: 0 0 0 #222 !important; }
+        .btn-panel-dark {
+            background: var(--text-dark) !important;
+            color: white !important;
+            border-color: transparent !important;
+            box-shadow: 0 4px 0 #222 !important;
+        }
+        .btn-panel-dark:active { box-shadow: 0 0 0 #222 !important; }
 
-        .effect-switch-row {
-            display: flex; align-items: center; justify-content: space-between;
-            background: rgba(0,0,0,0.05); padding: 8px; border-radius: 10px; margin-bottom: 8px;
-            font-size: 0.8rem;
-        }
-        .switch-input { cursor: pointer; width: 40px; height: 20px; }
+        .effect-switch-row {
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(0,0,0,0.05); padding: 8px; border-radius: 10px; margin-bottom: 8px;
+            font-size: 0.8rem;
+        }
+        .switch-input { cursor: pointer; width: 40px; height: 20px; }
 
-        .picker-btn { position: relative; overflow: hidden; }
-        #color-picker { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            opacity: 0; cursor: pointer;
-        }
+        .picker-btn { position: relative; overflow: hidden; }
+        #color-picker { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0; cursor: pointer;
+        }
 
-        .viewport { display: flex; height: 100%; transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1); }
-        .card { min-width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; }
-        
-        .window { 
-            background: var(--cloud-white); backdrop-filter: blur(12px); 
-            border-radius: 20px; padding: 20px; width: 100%; max-width: 320px; 
-            text-align: center; box-shadow: var(--shadow); border: 1px solid rgba(255, 255, 255, 0.6); 
-            height: 380px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;
-            /* iPhoneのノッチ対策 */
-            margin-top: env(safe-area-inset-top);
-        }
+        .viewport { display: flex; height: 100%; transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1); }
+        .card { min-width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; }
+        
+        .window { 
+            background: var(--cloud-white); backdrop-filter: blur(12px); 
+            border-radius: 20px; padding: 20px; width: 100%; max-width: 320px; 
+            text-align: center; box-shadow: var(--shadow); border: 1px solid rgba(255, 255, 255, 0.6); 
+            height: 360px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;
+            margin-top: env(safe-area-inset-top);
+        }
 
-        h2 { font-size: 1.0rem; margin-top: 0; margin-bottom: 10px; }
-        
-        .inventory-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; overflow-y: auto; padding: 4px; flex-grow: 1; -webkit-overflow-scrolling: touch; }
-        .inventory-grid::-webkit-scrollbar { display: none; }
+        h2 { font-size: 1.0rem; margin-top: 0; margin-bottom: 10px; }
+        
+        .inventory-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; overflow-y: auto; padding: 4px; flex-grow: 1; -webkit-overflow-scrolling: touch; }
+        .inventory-grid::-webkit-scrollbar { display: none; }
 
-        .item-chip { 
-            background: white; border: 1px solid #ddd; border-radius: 10px; 
-            padding: 4px 6px; font-size: 0.85rem; cursor: pointer; 
-            box-shadow: 0 4px 0 #ccc; display: flex; align-items: center; justify-content: center; min-height: 44px; position: relative;
-        }
-        .item-chip:active { transform: translateY(4px); box-shadow: 0 0 0 #ccc; background: var(--accent-orange); color: white; border-color: transparent; }
-        .item-chip.selected { background: var(--accent-orange); color: white; border-color: transparent; box-shadow: 0 4px 0 #d47e4d; }
+        .item-chip { 
+            background: white; border: 1px solid #ddd; border-radius: 10px; 
+            padding: 4px 6px; font-size: 0.85rem; cursor: pointer; 
+            box-shadow: 0 4px 0 #ccc; display: flex; align-items: center; justify-content: center; min-height: 44px; position: relative;
+        }
+        .item-chip:active { transform: translateY(4px); box-shadow: 0 0 0 #ccc; background: var(--accent-orange); color: white; border-color: transparent; }
+        .item-chip.selected { background: var(--accent-orange); color: white; border-color: transparent; box-shadow: 0 4px 0 #d47e4d; }
 
-        .slot-container { position: relative; height: 120px; overflow: hidden; margin: 5px 0; background: rgba(0,0,0,0.05); border-radius: 12px; touch-action: none; }
-        .slot-reel { transition: transform 0.3s ease-out; }
-        .slot-item { height: 40px; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; color: #888; }
-        .slot-item.active { color: var(--text-dark); font-weight: bold; font-size: 1.1rem; }
-        .slot-overlay { position: absolute; top: 40px; left: 0; width: 100%; height: 40px; pointer-events: none; border-top: 1px solid rgba(0,0,0,0.1); border-bottom: 1px solid rgba(0,0,0,0.1); background: rgba(0, 0, 0, 0.03); }
+        .slot-container { position: relative; height: 120px; overflow: hidden; margin: 5px 0; background: rgba(0,0,0,0.05); border-radius: 12px; touch-action: none; }
+        .slot-reel { transition: transform 0.3s ease-out; }
+        .slot-item { height: 40px; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; color: #888; }
+        .slot-item.active { color: var(--text-dark); font-weight: bold; font-size: 1.1rem; }
+        .slot-overlay { position: absolute; top: 40px; left: 0; width: 100%; height: 40px; pointer-events: none; border-top: 1px solid rgba(0,0,0,0.1); border-bottom: 1px solid rgba(0,0,0,0.1); background: rgba(0, 0, 0, 0.03); }
 
-        .btn-main { width: 100%; margin-top: 10px; padding: 12px; background: var(--text-dark) ; color: white; border: none; border-radius: 10px; font-family: inherit; font-size: 0.9rem; box-shadow: 0 4px 0 #222; cursor: pointer; position: relative; transition: transform 0.05s; }
-        .btn-main:active { transform: translateY(4px); box-shadow: 0 0 0 #222; }
+        .btn-main { width: 100%; margin-top: 10px; padding: 12px; background: var(--text-dark) ; color: white; border: none; border-radius: 10px; font-family: inherit; font-size: 0.9rem; box-shadow: 0 4px 0 #222; cursor: pointer; position: relative; transition: transform 0.05s; }
+        .btn-main:active { transform: translateY(4px); box-shadow: 0 0 0 #222; }
 
-        .free-input-wrapper { display: flex; gap: 8px; width: 100%; margin-top: 8px; }
-        .free-input, textarea { width: 100%; border: 1px solid #ddd; border-radius: 10px; padding: 10px; font-family: inherit; box-sizing: border-box; font-size: 0.85rem; outline: none; }
-        
-        .btn-dot-ok { 
-            width: 44px; height: 44px; background: var(--accent-green); color: white; 
-            border: none; border-radius: 50%; font-family: inherit; 
-            box-shadow: 0 4px 0 #4a7a66; cursor: pointer; display: flex; 
-            align-items: center; justify-content: center; flex-shrink: 0; transition: transform 0.05s;
-        }
-        .btn-dot-ok:active { transform: translateY(4px); box-shadow: 0 0 0 #4a7a66; }
-        
-        .pixel-check {
-            width: 16px; height: 16px; background-color: white;
-            clip-path: polygon(0% 50%, 12.5% 50%, 12.5% 62.5%, 25% 62.5%, 25% 75%, 37.5% 75%, 37.5% 87.5%, 50% 87.5%, 50% 75%, 62.5% 75%, 62.5% 62.5%, 75% 62.5%, 75% 50%, 87.5% 50%, 87.5% 37.5%, 100% 37.5%, 100% 12.5%, 87.5% 12.5%, 87.5% 25%, 75% 25%, 75% 37.5%, 62.5% 37.5%, 62.5% 50%, 50% 50%, 50% 62.5%, 37.5% 62.5%, 37.5% 50%, 25% 50%, 25% 37.5%, 12.5% 37.5%, 12.5% 50%, 0% 50%);
-        }
+        .free-input-wrapper { display: flex; gap: 8px; width: 100%; margin-top: 8px; }
+        .free-input, textarea { width: 100%; border: 1px solid #ddd; border-radius: 10px; padding: 10px; font-family: inherit; box-sizing: border-box; font-size: 0.85rem; outline: none; }
+        
+        .btn-dot-ok { 
+            width: 44px; height: 44px; background: var(--accent-green); color: white; 
+            border: none; border-radius: 50%; font-family: inherit; 
+            box-shadow: 0 4px 0 #4a7a66; cursor: pointer; display: flex; 
+            align-items: center; justify-content: center; flex-shrink: 0; transition: transform 0.05s;
+        }
+        .btn-dot-ok:active { transform: translateY(4px); box-shadow: 0 0 0 #4a7a66; }
+        
+        .pixel-check {
+            width: 16px; height: 16px; background-color: white;
+            clip-path: polygon(0% 50%, 12.5% 50%, 12.5% 62.5%, 25% 62.5%, 25% 75%, 37.5% 75%, 37.5% 87.5%, 50% 87.5%, 50% 75%, 62.5% 75%, 62.5% 62.5%, 75% 62.5%, 75% 50%, 87.5% 50%, 87.5% 37.5%, 100% 37.5%, 100% 12.5%, 87.5% 12.5%, 87.5% 25%, 75% 25%, 75% 37.5%, 62.5% 37.5%, 62.5% 50%, 50% 50%, 50% 62.5%, 37.5% 62.5%, 37.5% 50%, 25% 50%, 25% 37.5%, 12.5% 37.5%, 12.5% 50%, 0% 50%);
+        }
 
-        textarea { height: 80px; resize: none; margin-top: 8px; }
-        #summary { font-size:0.8rem; text-align:left; background:rgba(0,0,0,0.05); padding:12px; border-radius:10px; overflow-y:auto; flex:1; margin-bottom:5px; line-height:1.5; }
+        textarea { height: 80px; resize: none; margin-top: 8px; }
+        #summary { font-size:0.8rem; text-align:left; background:rgba(0,0,0,0.05); padding:12px; border-radius:10px; overflow-y:auto; flex:1; margin-bottom:5px; line-height:1.5; }
 
-        .btn-main.success { background: var(--accent-green) !important; box-shadow: 0 4px 0 #4a7a66 !important; }
-    </style>
+        .btn-main.success { background: var(--accent-green) !important; box-shadow: 0 4px 0 #4a7a66 !important; }
+    </style>
 </head>
 <body oncontextmenu="return false;">
 
@@ -173,340 +170,340 @@
 <canvas id="effect-canvas"></canvas>
 
 <div class="bg-settings">
-    <div class="bg-panel" id="bg-panel">
-        <div class="color-dots">
-            <div class="dot" style="background-color: #a3c1da;" onpointerup="applyBG('default')"></div>
-            <div id="p1" class="dot" onpointerup="selectPreset('p1')"></div>
-            <div id="p2" class="dot" onpointerup="selectPreset('p2')"></div>
-            <div id="p3" class="dot" onpointerup="selectPreset('p3')"></div>
-        </div>
-        
-        <div class="custom-color-wrapper">
-            <div class="effect-switch-row">
-                <span>エフェクト</span>
-                <input type="checkbox" id="effect-toggle" class="switch-input" onchange="toggleEffect(this.checked)">
-            </div>
-            <div class="btn-row">
-                <div class="btn-panel-item picker-btn btn-panel-dark">
-                    パレット
-                    <input type="color" id="color-picker" value="#a3c1da" oninput="applyBG(this.value)" onchange="applyBG(this.value)">
-                </div>
-                <div class="btn-panel-item btn-panel-dark" onpointerup="location.reload()">こうしん</div>
-            </div>
-            <input type="file" id="bg-upload" accept="image/*" style="display:none" onchange="uploadBG(this)">
-            <div class="btn-row">
-                <div class="btn-panel-item btn-panel-dark" onpointerup="document.getElementById('bg-upload').click()">画像えらぶ</div>
-                <div id="save-preset-btn" class="btn-panel-item" style="background:var(--accent-green); color:white; border-color:transparent; box-shadow:0 4px 0 #4a7a66;" onpointerup="saveToSelectedPreset()">保存する</div>
-            </div>
-        </div>
-    </div>
-    <button class="bg-btn" onpointerup="toggleBGPanel(event)">…</button>
+    <div class="bg-panel" id="bg-panel">
+        <div class="color-dots">
+            <div class="dot" style="background-color: #a3c1da;" onpointerup="applyBG('default')"></div>
+            <div id="p1" class="dot" onpointerup="selectPreset('p1')"></div>
+            <div id="p2" class="dot" onpointerup="selectPreset('p2')"></div>
+            <div id="p3" class="dot" onpointerup="selectPreset('p3')"></div>
+        </div>
+        
+        <div class="custom-color-wrapper">
+            <div class="effect-switch-row">
+                <span>エフェクト</span>
+                <input type="checkbox" id="effect-toggle" class="switch-input" onchange="toggleEffect(this.checked)">
+            </div>
+            <div class="btn-row">
+                <div class="btn-panel-item picker-btn btn-panel-dark">
+                    パレット
+                    <input type="color" id="color-picker" value="#a3c1da" oninput="applyBG(this.value)" onchange="applyBG(this.value)">
+                </div>
+                <div class="btn-panel-item btn-panel-dark" onpointerup="location.reload()">こうしん</div>
+            </div>
+            <input type="file" id="bg-upload" accept="image/*" style="display:none" onchange="uploadBG(this)">
+            <div class="btn-row">
+                <div class="btn-panel-item btn-panel-dark" onpointerup="document.getElementById('bg-upload').click()">画像えらぶ</div>
+                <div id="save-preset-btn" class="btn-panel-item" style="background:var(--accent-green); color:white; border-color:transparent; box-shadow:0 4px 0 #4a7a66;" onpointerup="saveToSelectedPreset()">保存する</div>
+            </div>
+        </div>
+    </div>
+    <button class="bg-btn" onpointerup="toggleBGPanel(event)">…</button>
 </div>
 
 <div class="viewport" id="viewport">
-    <div class="card"><div class="window"><h2>だれと あそぶ？</h2><div class="inventory-grid"><div class="item-chip" onpointerup="quickSave(1, 'ひとり')">ひとり</div><div class="item-chip" onpointerup="quickSave(1, '彼女と2人')">彼女</div><div class="item-chip" onpointerup="quickSave(1, '友達(2-4人)')">友達</div> <div class="item-chip" onpointerup="quickSave(1, '友達(大人数)')">友達(大人数)</div><div class="item-chip" onpointerup="quickSave(1, '会社')">会社</div><div class="item-chip" onpointerup="quickSave(1, '家族')">家族</div></div><div class="free-input-wrapper"><input type="text" id="q1_free" class="free-input" placeholder="そのほか..." onkeydown="if(event.key==='Enter') save(1, this.value)"><button class="btn-dot-ok" onpointerup="save(1, document.getElementById('q1_free').value)"><div class="pixel-check"></div></button></div></div></div>
-    <div class="card"><div class="window"><h2>なにを したい？</h2><div class="inventory-grid" id="q2_grid"><div class="item-chip" onpointerup="toggleItem(this, 'モーニング')">モーニング</div><div class="item-chip" onpointerup="toggleItem(this, 'ランチ')">ランチ</div><div class="item-chip" onpointerup="toggleItem(this, 'カフェ')">カフェ</div><div class="item-chip" onpointerup="toggleItem(this, 'ディナー')">ディナー</div><div class="item-chip" onpointerup="toggleItem(this, 'バータイム')">バータイム</div><div class="item-chip" onpointerup="toggleItem(this, '深夜')">深夜</div><div class="item-chip" onpointerup="toggleItem(this, 'パン')">パン</div><div class="item-chip" onpointerup="toggleItem(this, 'スイーツ')">スイーツ</div><div class="item-chip" onpointerup="toggleItem(this, '遊び')">遊び</div><div class="item-chip" onpointerup="toggleItem(this, 'のんびり')">のんびり</div></div><input type="text" id="q2_free" class="free-input" placeholder="そのほか入力..."><button class="btn-main" onpointerup="nextMulti()">これでいく！</button></div></div>
-    <div class="card"><div class="window"><h2>どこへ むかう？</h2><div class="inventory-grid"><div class="item-chip" id="gps-btn" onpointerup="getPreciseLocation(3)">現在地</div><div class="item-chip" onpointerup="quickSave(3, '本通周辺')">本通周辺</div><div class="item-chip" onpointerup="quickSave(3, '広島駅')">広島駅</div><div class="item-chip" style="background: rgba(103, 163, 139, 0.1); border: 1px dashed var(--accent-green);" onpointerup="openMap(3)">地図を開く</div></div><div class="free-input-wrapper"><input type="text" id="q3_free" class="free-input" placeholder="場所・住所..." onkeydown="if(event.key==='Enter') save(3, this.value)"><button class="btn-dot-ok" onpointerup="save(3, document.getElementById('q3_free').value)"><div class="pixel-check"></div></button></div></div></div>
-    <div class="card"><div class="window"><h2>いつ いく？</h2><div class="slot-container" id="slot4"><div class="slot-reel"></div><div class="slot-overlay"></div></div><div class="free-input-wrapper"><input type="text" id="q4_free" class="free-input" placeholder="自由指定..." onkeydown="if(event.key==='Enter') saveSlot(4)"><button class="btn-dot-ok" onpointerup="saveSlot(4)"><div class="pixel-check"></div></button></div></div></div>
-    <div class="card"><div class="window"><h2>よさんは？</h2><div class="slot-container" id="slot5"><div class="slot-reel"></div><div class="slot-overlay"></div></div><button class="btn-main" onpointerup="saveSlot(5)">この予算で！</button></div></div>
-    <div class="card"><div class="window"><h2>どうやって いく？</h2><div class="inventory-grid"><div class="item-chip" onpointerup="quickSave(6, '徒歩')">あるき</div> <div class="item-chip" onpointerup="quickSave(6, '公共交通機関')">電車・バス</div><div class="item-chip" onpointerup="quickSave(6, '車')">車</div><div class="item-chip" onpointerup="quickSave(6, 'タクシー')">タクシー</div></div></div></div>
-    <div class="card"><div class="window"><h2>テーマは？</h2><div class="inventory-grid"><div class="item-chip" onpointerup="quickSave(7, '特になし')">特になし</div><div class="item-chip" onpointerup="quickSave(7, 'カジュアル')">カジュアル</div><div class="item-chip" onpointerup="quickSave(7, 'ゆったり')">ゆったり</div><div class="item-chip" onpointerup="quickSave(7, '映え')">映え</div></div></div></div>
-    <div class="card"><div class="window"><h2>こだわり</h2><textarea id="q8" placeholder="（なければ空欄）"></textarea><button class="btn-main" onpointerup="delayedNext()">次へ</button></div></div>
-    <div class="card"><div class="window"><h2>ＮＧ！</h2><textarea id="q9" placeholder="（なければ空欄）"></textarea><button class="btn-main" onpointerup="delayedNext()">最終確認へ</button></div></div>
-    <div class="card"><div class="window"><h2>じゅんび OK！</h2><div id="summary"></div><button id="btn-finish" class="btn-main" style="background:var(--accent-orange); box-shadow:0 4px 0 #d47e4d;" onpointerup="finish()">これでけってい！</button></div></div>
+    <div class="card"><div class="window"><h2>だれと あそぶ？</h2><div class="inventory-grid"><div class="item-chip" onpointerup="quickSave(1, 'ひとり')">ひとり</div><div class="item-chip" onpointerup="quickSave(1, '彼女と2人')">彼女</div><div class="item-chip" onpointerup="quickSave(1, '友達(2-4人)')">友達</div> <div class="item-chip" onpointerup="quickSave(1, '友達(大人数)')">友達(大人数)</div><div class="item-chip" onpointerup="quickSave(1, '会社')">会社</div><div class="item-chip" onpointerup="quickSave(1, '家族')">家族</div></div><div class="free-input-wrapper"><input type="text" id="q1_free" class="free-input" placeholder="そのほか..." onkeydown="if(event.key==='Enter') save(1, this.value)"><button class="btn-dot-ok" onpointerup="save(1, document.getElementById('q1_free').value)"><div class="pixel-check"></div></button></div></div></div>
+    <div class="card"><div class="window"><h2>なにを したい？</h2><div class="inventory-grid" id="q2_grid"><div class="item-chip" onpointerup="toggleItem(this, 'モーニング')">モーニング</div><div class="item-chip" onpointerup="toggleItem(this, 'ランチ')">ランチ</div><div class="item-chip" onpointerup="toggleItem(this, 'カフェ')">カフェ</div><div class="item-chip" onpointerup="toggleItem(this, 'ディナー')">ディナー</div><div class="item-chip" onpointerup="toggleItem(this, 'バータイム')">バータイム</div><div class="item-chip" onpointerup="toggleItem(this, '深夜')">深夜</div><div class="item-chip" onpointerup="toggleItem(this, 'パン')">パン</div><div class="item-chip" onpointerup="toggleItem(this, 'スイーツ')">スイーツ</div><div class="item-chip" onpointerup="toggleItem(this, '遊び')">遊び</div><div class="item-chip" onpointerup="toggleItem(this, 'のんびり')">のんびり</div></div><input type="text" id="q2_free" class="free-input" placeholder="そのほか入力..."><button class="btn-main" onpointerup="nextMulti()">これでいく！</button></div></div>
+    <div class="card"><div class="window"><h2>どこへ むかう？</h2><div class="inventory-grid"><div class="item-chip" id="gps-btn" onpointerup="getPreciseLocation(3)">現在地</div><div class="item-chip" onpointerup="quickSave(3, '本通周辺')">本通周辺</div><div class="item-chip" onpointerup="quickSave(3, '広島駅')">広島駅</div><div class="item-chip" style="background: rgba(103, 163, 139, 0.1); border: 1px dashed var(--accent-green);" onpointerup="openMap(3)">地図を開く</div></div><div class="free-input-wrapper"><input type="text" id="q3_free" class="free-input" placeholder="場所・住所..." onkeydown="if(event.key==='Enter') save(3, this.value)"><button class="btn-dot-ok" onpointerup="save(3, document.getElementById('q3_free').value)"><div class="pixel-check"></div></button></div></div></div>
+    <div class="card"><div class="window"><h2>いつ いく？</h2><div class="slot-container" id="slot4"><div class="slot-reel"></div><div class="slot-overlay"></div></div><div class="free-input-wrapper"><input type="text" id="q4_free" class="free-input" placeholder="自由指定..." onkeydown="if(event.key==='Enter') saveSlot(4)"><button class="btn-dot-ok" onpointerup="saveSlot(4)"><div class="pixel-check"></div></button></div></div></div>
+    <div class="card"><div class="window"><h2>よさんは？</h2><div class="slot-container" id="slot5"><div class="slot-reel"></div><div class="slot-overlay"></div></div><button class="btn-main" onpointerup="saveSlot(5)">この予算で！</button></div></div>
+    <div class="card"><div class="window"><h2>どうやって いく？</h2><div class="inventory-grid"><div class="item-chip" onpointerup="quickSave(6, '徒歩')">あるき</div> <div class="item-chip" onpointerup="quickSave(6, '公共交通機関')">電車・バス</div><div class="item-chip" onpointerup="quickSave(6, '車')">車</div><div class="item-chip" onpointerup="quickSave(6, 'タクシー')">タクシー</div></div></div></div>
+    <div class="card"><div class="window"><h2>テーマは？</h2><div class="inventory-grid"><div class="item-chip" onpointerup="quickSave(7, '特になし')">特になし</div><div class="item-chip" onpointerup="quickSave(7, 'カジュアル')">カジュアル</div><div class="item-chip" onpointerup="quickSave(7, 'ゆったり')">ゆったり</div><div class="item-chip" onpointerup="quickSave(7, '映え')">映え</div></div></div></div>
+    <div class="card"><div class="window"><h2>こだわり</h2><textarea id="q8" placeholder="（なければ空欄）"></textarea><button class="btn-main" onpointerup="delayedNext()">次へ</button></div></div>
+    <div class="card"><div class="window"><h2>ＮＧ！</h2><textarea id="q9" placeholder="（なければ空欄）"></textarea><button class="btn-main" onpointerup="delayedNext()">最終確認へ</button></div></div>
+    <div class="card"><div class="window"><h2>じゅんび OK！</h2><div id="summary"></div><button id="btn-finish" class="btn-main" style="background:var(--accent-orange); box-shadow:0 4px 0 #d47e4d;" onpointerup="finish()">これでけってい！</button></div></div>
 </div>
 
 <script>
-    document.addEventListener('touchmove', function(e) {
-        if (!e.target.closest('.inventory-grid') && !e.target.closest('textarea') && !e.target.closest('#summary')) {
-            e.preventDefault();
-        }
-    }, { passive: false });
+    document.addEventListener('touchmove', function(e) {
+        if (!e.target.closest('.inventory-grid') && !e.target.closest('textarea') && !e.target.closest('#summary')) {
+            e.preventDefault();
+        }
+    }, { passive: false });
 
-    let step = 0;
-    let startY = 0, moveY = 0; 
-    const data = { q1:'', q2:[], q3:'', q4:'', q5:'', q6:'', q7:'', q8:'', q9:'' };
-    const options = { 4: ['今すぐ', '15分後', '30分後', '1時間後'], 5: ['特になし', '～1000円', '～2000円', '～3000円', '～5000円', '～10000円', '上限なし'] };
-    const slotState = { 4: 0, 5: 0 };
-    let q2_selected_chips = [];
-    let selectedPresetId = null;
-    let currentBGValue = '#a3c1da';
-    const ACTION_DELAY = 250; 
+    let step = 0;
+    let startY = 0, moveY = 0; 
+    const data = { q1:'', q2:[], q3:'', q4:'', q5:'', q6:'', q7:'', q8:'', q9:'' };
+    const options = { 4: ['今すぐ', '15分後', '30分後', '1時間後'], 5: ['特になし', '～1000円', '～2000円', '～3000円', '～5000円', '～10000円', '上限なし'] };
+    const slotState = { 4: 0, 5: 0 };
+    let q2_selected_chips = [];
+    let selectedPresetId = null;
+    let currentBGValue = '#a3c1da';
+    const ACTION_DELAY = 250; 
 
-    let effectActive = false;
-    let effectType = 'none'; 
-    const canvas = document.getElementById('effect-canvas');
-    const ctx = canvas.getContext('2d');
-    let particles = [];
+    let effectActive = false;
+    let effectType = 'none'; 
+    const canvas = document.getElementById('effect-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
 
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        if(effectActive) initParticles();
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        if(effectActive) initParticles();
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
 
-    function toggleEffect(active) {
-        effectActive = active;
-        localStorage.setItem('sora_effect_enabled', active);
-        if (active) {
-            effectType = Math.random() > 0.5 ? 'rain' : 'cloud';
-            initParticles();
-            requestAnimationFrame(animate);
-        } else {
-            particles = [];
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-    }
+    function toggleEffect(active) {
+        effectActive = active;
+        localStorage.setItem('sora_effect_enabled', active);
+        if (active) {
+            effectType = Math.random() > 0.5 ? 'rain' : 'cloud';
+            initParticles();
+            requestAnimationFrame(animate);
+        } else {
+            particles = [];
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    }
 
-    function initParticles() {
-        particles = [];
-        const count = effectType === 'rain' ? 35 : 4; 
-        for (let i = 0; i < count; i++) {
-            if (effectType === 'rain') {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    l: Math.random() * 15 + 10, 
-                    v: Math.random() * 4 + 7    
-                });
-            } else {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * (canvas.height * 0.35),
-                    s: Math.random() * 0.3 + 0.15,
-                    w: Math.random() * 80 + 70 
-                });
-            }
-        }
-    }
+    function initParticles() {
+        particles = [];
+        const count = effectType === 'rain' ? 35 : 4; 
+        for (let i = 0; i < count; i++) {
+            if (effectType === 'rain') {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    l: Math.random() * 15 + 10, 
+                    v: Math.random() * 4 + 7    
+                });
+            } else {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * (canvas.height * 0.35),
+                    s: Math.random() * 0.3 + 0.15,
+                    w: Math.random() * 80 + 70 
+                });
+            }
+        }
+    }
 
-    function animate() {
-        if (!effectActive) return;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        if (effectType === 'rain') {
-            ctx.lineWidth = 1.5;
-            particles.forEach(p => {
-                ctx.strokeStyle = 'rgba(0,0,0,0.25)'; 
-                ctx.beginPath(); ctx.moveTo(p.x+1, p.y+1); ctx.lineTo(p.x+1, p.y + p.l + 1); ctx.stroke();
-                ctx.strokeStyle = 'rgba(255,255,255,0.7)'; 
-                ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x, p.y + p.l); ctx.stroke();
-                p.y += p.v;
-                if (p.y > canvas.height) { p.y = -p.l; p.x = Math.random() * canvas.width; }
-            });
-        } else {
-            particles.forEach(p => {
-                const drawPixelCloud = (x, y, baseW) => {
-                    const h = baseW * 0.6;
-                    const blocks = [
-                        { dx: 0, dy: 0, bw: 1.0, bh: 0.4 },      
-                        { dx: 0.1, dy: -0.2, bw: 0.8, bh: 0.6 }, 
-                        { dx: 0.25, dy: -0.4, bw: 0.5, bh: 0.8 },
-                        { dx: 0.15, dy: 0.15, bw: 0.7, bh: 0.35 },
-                        { dx: 0.05, dy: 0.05, bw: 0.3, bh: 0.3 }  
-                    ];
-                    ctx.fillStyle = 'rgba(0,0,0,0.2)';
-                    blocks.forEach(b => { ctx.fillRect(x + b.dx * baseW + 3, y + b.dy * h + 3, b.bw * baseW, b.bh * h); });
-                    ctx.fillStyle = 'white';
-                    blocks.forEach(b => { ctx.fillRect(x + b.dx * baseW, y + b.dy * h, b.bw * baseW, b.bh * h); });
-                };
-                drawPixelCloud(p.x, p.y, p.w);
-                p.x += p.s;
-                if (p.x > canvas.width) { 
-                    p.x = -p.w * 1.5; 
-                    p.y = Math.random() * (canvas.height * 0.35);
-                    p.w = Math.random() * 80 + 70;
-                }
-            });
-        }
-        requestAnimationFrame(animate);
-    }
+    function animate() {
+        if (!effectActive) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        if (effectType === 'rain') {
+            ctx.lineWidth = 1.5;
+            particles.forEach(p => {
+                ctx.strokeStyle = 'rgba(0,0,0,0.25)'; 
+                ctx.beginPath(); ctx.moveTo(p.x+1, p.y+1); ctx.lineTo(p.x+1, p.y + p.l + 1); ctx.stroke();
+                ctx.strokeStyle = 'rgba(255,255,255,0.7)'; 
+                ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x, p.y + p.l); ctx.stroke();
+                p.y += p.v;
+                if (p.y > canvas.height) { p.y = -p.l; p.x = Math.random() * canvas.width; }
+            });
+        } else {
+            particles.forEach(p => {
+                const drawPixelCloud = (x, y, baseW) => {
+                    const h = baseW * 0.6;
+                    const blocks = [
+                        { dx: 0, dy: 0, bw: 1.0, bh: 0.4 },      
+                        { dx: 0.1, dy: -0.2, bw: 0.8, bh: 0.6 }, 
+                        { dx: 0.25, dy: -0.4, bw: 0.5, bh: 0.8 },
+                        { dx: 0.15, dy: 0.15, bw: 0.7, bh: 0.35 },
+                        { dx: 0.05, dy: 0.05, bw: 0.3, bh: 0.3 }  
+                    ];
+                    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+                    blocks.forEach(b => { ctx.fillRect(x + b.dx * baseW + 3, y + b.dy * h + 3, b.bw * baseW, b.bh * h); });
+                    ctx.fillStyle = 'white';
+                    blocks.forEach(b => { ctx.fillRect(x + b.dx * baseW, y + b.dy * h, b.bw * baseW, b.bh * h); });
+                };
+                drawPixelCloud(p.x, p.y, p.w);
+                p.x += p.s;
+                if (p.x > canvas.width) { 
+                    p.x = -p.w * 1.5; 
+                    p.y = Math.random() * (canvas.height * 0.35);
+                    p.w = Math.random() * 80 + 70;
+                }
+            });
+        }
+        requestAnimationFrame(animate);
+    }
 
-    function toggleBGPanel(e) { 
-        if(e) e.stopPropagation(); 
-        const p = document.getElementById('bg-panel'); 
-        p.style.display = (p.style.display === 'block') ? 'none' : 'block'; 
-    }
-    
-    function closeBGPanel() {
-        const p = document.getElementById('bg-panel');
-        if (p.style.display === 'block') p.style.display = 'none';
-    }
+    function toggleBGPanel(e) { 
+        if(e) e.stopPropagation(); 
+        const p = document.getElementById('bg-panel'); 
+        p.style.display = (p.style.display === 'block') ? 'none' : 'block'; 
+    }
+    
+    function closeBGPanel() {
+        const p = document.getElementById('bg-panel');
+        if (p.style.display === 'block') p.style.display = 'none';
+    }
 
-    function applyBG(val) { 
-        if(!val) return; 
-        currentBGValue = val;
-        const bg = document.getElementById('sky-bg'); 
-        if (val === 'default') { 
-            document.body.style.backgroundColor = '#a3c1da';
-            document.documentElement.style.backgroundColor = '#a3c1da';
-            bg.style.backgroundImage = 'none'; 
-            currentBGValue = '#a3c1da';
-        } else if (val.startsWith('data:image')) { 
-            bg.style.backgroundImage = `url(${val})`; 
-        } else { 
-            document.body.style.backgroundColor = val;
-            document.documentElement.style.backgroundColor = val;
-            bg.style.backgroundImage = 'none'; 
-        } 
-        localStorage.setItem('sora_bg_v7_solid', val); 
-    }
-    
-    function selectPreset(id) {
-        document.querySelectorAll('.dot').forEach(d => d.classList.remove('active-preset'));
-        const dot = document.getElementById(id);
-        dot.classList.add('active-preset');
-        selectedPresetId = id;
-        
-        const savedImage = localStorage.getItem('sora_img_preset_v7_' + id);
-        const savedColor = localStorage.getItem('sora_preset_v7_' + id);
-        
-        if (savedImage) applyBG(savedImage);
-        else if (savedColor) applyBG(savedColor);
-    }
+    function applyBG(val) { 
+        if(!val) return; 
+        currentBGValue = val;
+        const bg = document.getElementById('sky-bg'); 
+        if (val === 'default') { 
+            document.body.style.backgroundColor = '#a3c1da';
+            document.documentElement.style.backgroundColor = '#a3c1da';
+            bg.style.backgroundImage = 'none'; 
+            currentBGValue = '#a3c1da';
+        } else if (val.startsWith('data:image')) { 
+            bg.style.backgroundImage = `url(${val})`; 
+        } else { 
+            document.body.style.backgroundColor = val;
+            document.documentElement.style.backgroundColor = val;
+            bg.style.backgroundImage = 'none'; 
+        } 
+        localStorage.setItem('sora_bg_v7_solid', val); 
+    }
+    
+    function selectPreset(id) {
+        document.querySelectorAll('.dot').forEach(d => d.classList.remove('active-preset'));
+        const dot = document.getElementById(id);
+        dot.classList.add('active-preset');
+        selectedPresetId = id;
+        
+        const savedImage = localStorage.getItem('sora_img_preset_v7_' + id);
+        const savedColor = localStorage.getItem('sora_preset_v7_' + id);
+        
+        if (savedImage) applyBG(savedImage);
+        else if (savedColor) applyBG(savedColor);
+    }
 
-    function saveToSelectedPreset() {
-        if (!selectedPresetId) return alert("保存先の○をえらんでね！");
-        
-        const dot = document.getElementById(selectedPresetId);
-        const currentToSave = currentBGValue;
+    function saveToSelectedPreset() {
+        if (!selectedPresetId) return alert("保存先の○をえらんでね！");
+        
+        const dot = document.getElementById(selectedPresetId);
+        const currentToSave = currentBGValue;
 
-        if (currentToSave.startsWith('data:image')) {
-            dot.style.backgroundImage = `url(${currentToSave})`;
-            dot.style.backgroundColor = 'transparent';
-            localStorage.setItem('sora_img_preset_v7_' + selectedPresetId, currentToSave);
-            localStorage.removeItem('sora_preset_v7_' + selectedPresetId);
-        } else {
-            dot.style.backgroundImage = 'none';
-            dot.style.backgroundColor = currentToSave;
-            localStorage.setItem('sora_preset_v7_' + selectedPresetId, currentToSave);
-            localStorage.removeItem('sora_img_preset_v7_' + selectedPresetId);
-        }
-        alert("ここに上書き保存したよ！");
-    }
+        if (currentToSave.startsWith('data:image')) {
+            dot.style.backgroundImage = `url(${currentToSave})`;
+            dot.style.backgroundColor = 'transparent';
+            localStorage.setItem('sora_img_preset_v7_' + selectedPresetId, currentToSave);
+            localStorage.removeItem('sora_preset_v7_' + selectedPresetId);
+        } else {
+            dot.style.backgroundImage = 'none';
+            dot.style.backgroundColor = currentToSave;
+            localStorage.setItem('sora_preset_v7_' + selectedPresetId, currentToSave);
+            localStorage.removeItem('sora_img_preset_v7_' + selectedPresetId);
+        }
+        alert("ここに上書き保存したよ！");
+    }
 
-    function uploadBG(input) { if (input.files?.[0]) { const reader = new FileReader(); reader.onload = (e) => applyBG(e.target.result); reader.readAsDataURL(input.files[0]); } }
-    
-    function initSlots() { 
-        ['p1', 'p2', 'p3'].forEach(id => { 
-            const savedColor = localStorage.getItem('sora_preset_v7_' + id); 
-            const savedImage = localStorage.getItem('sora_img_preset_v7_' + id);
-            const dot = document.getElementById(id);
-            if(savedImage) { dot.style.backgroundImage = `url(${savedImage})`; }
-            else if(savedColor) { dot.style.backgroundColor = savedColor; }
-        }); 
-        const savedBG = localStorage.getItem('sora_bg_v7_solid'); 
-        if (savedBG) applyBG(savedBG); else applyBG('default');
+    function uploadBG(input) { if (input.files?.[0]) { const reader = new FileReader(); reader.onload = (e) => applyBG(e.target.result); reader.readAsDataURL(input.files[0]); } }
+    
+    function initSlots() { 
+        ['p1', 'p2', 'p3'].forEach(id => { 
+            const savedColor = localStorage.getItem('sora_preset_v7_' + id); 
+            const savedImage = localStorage.getItem('sora_img_preset_v7_' + id);
+            const dot = document.getElementById(id);
+            if(savedImage) { dot.style.backgroundImage = `url(${savedImage})`; }
+            else if(savedColor) { dot.style.backgroundColor = savedColor; }
+        }); 
+        const savedBG = localStorage.getItem('sora_bg_v7_solid'); 
+        if (savedBG) applyBG(savedBG); else applyBG('default');
 
-        const effectStored = localStorage.getItem('sora_effect_enabled') === 'true';
-        document.getElementById('effect-toggle').checked = effectStored;
-        if(effectStored) toggleEffect(true);
+        const effectStored = localStorage.getItem('sora_effect_enabled') === 'true';
+        document.getElementById('effect-toggle').checked = effectStored;
+        if(effectStored) toggleEffect(true);
 
-        [4, 5].forEach(n => {
-            const reel = document.querySelector(`#slot${n} .slot-reel`);
-            reel.innerHTML = `<div class="slot-item"></div>` + options[n].map(opt => `<div class="slot-item">${opt}</div>`).join('') + `<div class="slot-item"></div>`;
-            reel.addEventListener('touchstart', e => { startY = e.touches[0].pageY; }, {passive: true});
-            reel.addEventListener('touchmove', e => { moveY = e.touches[0].pageY - startY; reel.style.transform = `translateY(${-(slotState[n] * 40) + moveY}px)`; }, {passive: true});
-            reel.addEventListener('touchend', () => { slotState[n] = Math.max(0, Math.min(options[n].length - 1, slotState[n] - Math.round(moveY / 40))); reel.style.transform = `translateY(-${slotState[n] * 40}px)`; updateSlotStyle(n); moveY = 0; });
-            updateSlotStyle(n);
-        });
-    }
+        [4, 5].forEach(n => {
+            const reel = document.querySelector(`#slot${n} .slot-reel`);
+            reel.innerHTML = `<div class="slot-item"></div>` + options[n].map(opt => `<div class="slot-item">${opt}</div>`).join('') + `<div class="slot-item"></div>`;
+            reel.addEventListener('touchstart', e => { startY = e.touches[0].pageY; }, {passive: true});
+            reel.addEventListener('touchmove', e => { moveY = e.touches[0].pageY - startY; reel.style.transform = `translateY(${-(slotState[n] * 40) + moveY}px)`; }, {passive: true});
+            reel.addEventListener('touchend', () => { slotState[n] = Math.max(0, Math.min(options[n].length - 1, slotState[n] - Math.round(moveY / 40))); reel.style.transform = `translateY(-${slotState[n] * 40}px)`; updateSlotStyle(n); moveY = 0; });
+            updateSlotStyle(n);
+        });
+    }
 
-    function updateSlotStyle(n) { const items = document.querySelectorAll(`#slot${n} .slot-item`); items.forEach((it, idx) => { it.className = (idx === slotState[n] + 1) ? 'slot-item active' : 'slot-item'; }); }
-    
-    function quickSave(n, val) { data[`q${n}`] = val; setTimeout(next, ACTION_DELAY); }
-    function save(n, val) { if(!val) return alert("入力してね！"); data[`q${n}`] = val; setTimeout(next, ACTION_DELAY); }
+    function updateSlotStyle(n) { const items = document.querySelectorAll(`#slot${n} .slot-item`); items.forEach((it, idx) => { it.className = (idx === slotState[n] + 1) ? 'slot-item active' : 'slot-item'; }); }
+    
+    function quickSave(n, val) { data[`q${n}`] = val; setTimeout(next, ACTION_DELAY); }
+    function save(n, val) { if(!val) return alert("入力してね！"); data[`q${n}`] = val; setTimeout(next, ACTION_DELAY); }
 
-    function saveSlot(n) { 
-        let val = document.getElementById(`q${n}_free`)?.value || options[n][slotState[n]]; 
-        if (n === 4) { 
-            const now = new Date(); 
-            const y = now.getFullYear(); const m = now.getMonth() + 1; const d = now.getDate();
-            const hh = now.getHours().toString().padStart(2, '0'); 
-            const mm = now.getMinutes().toString().padStart(2, '0'); 
-            val = `${val}(現在時刻:${y}/${m}/${d} ${hh}:${mm})`; 
-        } 
-        data[`q${n}`] = val; 
-        setTimeout(next, ACTION_DELAY); 
-    }
+    function saveSlot(n) { 
+        let val = document.getElementById(`q${n}_free`)?.value || options[n][slotState[n]]; 
+        if (n === 4) { 
+            const now = new Date(); 
+            const y = now.getFullYear(); const m = now.getMonth() + 1; const d = now.getDate();
+            const hh = now.getHours().toString().padStart(2, '0'); 
+            const mm = now.getMinutes().toString().padStart(2, '0'); 
+            val = `${val}(現在時刻:${y}/${m}/${d} ${hh}:${mm})`; 
+        } 
+        data[`q${n}`] = val; 
+        setTimeout(next, ACTION_DELAY); 
+    }
 
-    function toggleItem(el, val) { el.classList.toggle('selected'); const idx = q2_selected_chips.indexOf(val); if (idx > -1) q2_selected_chips.splice(idx, 1); else q2_selected_chips.push(val); }
-    function nextMulti() { const free = document.getElementById('q2_free').value; data.q2 = [...q2_selected_chips]; if(free) data.q2.push(free); if(!data.q2.length) return alert("なにか選んでね！"); setTimeout(next, ACTION_DELAY); }
-    function delayedNext() { setTimeout(next, ACTION_DELAY); }
-    
-    function next() { if(step < 9) { step++; update(); } }
-    function prev() { if(step > 0) { step--; update(); } }
-    
-    function update() { 
-        document.getElementById('viewport').style.transform = `translateX(-${step * 100}%)`; 
-        document.getElementById('btn-back').style.display = step > 0 ? 'flex' : 'none'; 
-        if(step === 9) { 
-            data.q8 = document.getElementById('q8').value || 'なし'; 
-            data.q9 = document.getElementById('q9').value || 'なし'; 
-            document.getElementById('summary').innerHTML = `
-                <b>■構成：</b>${data.q1}<br>
-                <b>■目的：</b>${data.q2.join('・')}<br>
-                <b>■場所：</b>${data.q3}<br>
-                <b>■時間：</b>${data.q4}<br>
-                <b>■予算：</b>${data.q5}<br>
-                <b>■移動：</b>${data.q6}<br>
-                <b>■テーマ：</b>${data.q7}<br>
-                <b>■こだわり：</b>${data.q8}<br>
-                <b>■NG条件：</b>${data.q9}
-            `; 
-        } 
-    }
+    function toggleItem(el, val) { el.classList.toggle('selected'); const idx = q2_selected_chips.indexOf(val); if (idx > -1) q2_selected_chips.splice(idx, 1); else q2_selected_chips.push(val); }
+    function nextMulti() { const free = document.getElementById('q2_free').value; data.q2 = [...q2_selected_chips]; if(free) data.q2.push(free); if(!data.q2.length) return alert("なにか選んでね！"); setTimeout(next, ACTION_DELAY); }
+    function delayedNext() { setTimeout(next, ACTION_DELAY); }
+    
+    function next() { if(step < 9) { step++; update(); } }
+    function prev() { if(step > 0) { step--; update(); } }
+    
+    function update() { 
+        document.getElementById('viewport').style.transform = `translateX(-${step * 100}%)`; 
+        document.getElementById('btn-back').style.display = step > 0 ? 'flex' : 'none'; 
+        if(step === 9) { 
+            data.q8 = document.getElementById('q8').value || 'なし'; 
+            data.q9 = document.getElementById('q9').value || 'なし'; 
+            document.getElementById('summary').innerHTML = `
+                <b>■構成：</b>${data.q1}<br>
+                <b>■目的：</b>${data.q2.join('・')}<br>
+                <b>■場所：</b>${data.q3}<br>
+                <b>■時間：</b>${data.q4}<br>
+                <b>■予算：</b>${data.q5}<br>
+                <b>■移動：</b>${data.q6}<br>
+                <b>■テーマ：</b>${data.q7}<br>
+                <b>■こだわり：</b>${data.q8}<br>
+                <b>■NG条件：</b>${data.q9}
+            `; 
+        } 
+    }
 
-    async function getPreciseLocation(n) {
-        if (!navigator.geolocation) return alert("GPSが使えません");
-        const btn = document.getElementById('gps-btn'); 
-        btn.innerText = "住所を解析中...";
-        let bestPos = null;
-        let count = 0;
-        const watchId = navigator.geolocation.watchPosition((pos) => {
-            count++;
-            if (!bestPos || pos.coords.accuracy < bestPos.coords.accuracy) { bestPos = pos; }
-            if (pos.coords.accuracy < 15 || count > 4) finalize(bestPos);
-        }, () => {}, { enableHighAccuracy: true, timeout: 6000 });
-        const timerId = setTimeout(() => finalize(bestPos), 4500);
-        async function finalize(pos) {
-            navigator.geolocation.clearWatch(watchId);
-            clearTimeout(timerId);
-            if (!pos) { btn.innerText = "再試行してね"; return; }
-            const lat = pos.coords.latitude; 
-            const lng = pos.coords.longitude;
-            try {
-                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, { headers: { 'Accept-Language': 'ja' } });
-                const resData = await response.json(); 
-                let addr = "";
-                if (resData.address) {
-                    const a = resData.address;
-                    addr = (a.province || "") + (a.city || a.town || a.village || "") + (a.suburb || a.city_district || "") + (a.neighbourhood || "") + (a.road || "") + (a.house_number || "");
-                } else { addr = `${lat.toFixed(4)},${lng.toFixed(4)}`; }
-                data[`q${n}`] = `現在地(${addr})`; 
-                btn.innerText = "完了！"; 
-                setTimeout(next, ACTION_DELAY + 200);
-            } catch (e) { 
-                data[`q${n}`] = `現在地(${lat.toFixed(4)},${lng.toFixed(4)})`; 
-                btn.innerText = "座標で完了"; 
-                setTimeout(next, ACTION_DELAY + 200); 
-            }
-        }
-    }
+    async function getPreciseLocation(n) {
+        if (!navigator.geolocation) return alert("GPSが使えません");
+        const btn = document.getElementById('gps-btn'); 
+        btn.innerText = "住所を解析中...";
+        let bestPos = null;
+        let count = 0;
+        const watchId = navigator.geolocation.watchPosition((pos) => {
+            count++;
+            if (!bestPos || pos.coords.accuracy < bestPos.coords.accuracy) { bestPos = pos; }
+            if (pos.coords.accuracy < 15 || count > 4) finalize(bestPos);
+        }, () => {}, { enableHighAccuracy: true, timeout: 6000 });
+        const timerId = setTimeout(() => finalize(bestPos), 4500);
+        async function finalize(pos) {
+            navigator.geolocation.clearWatch(watchId);
+            clearTimeout(timerId);
+            if (!pos) { btn.innerText = "再試行してね"; return; }
+            const lat = pos.coords.latitude; 
+            const lng = pos.coords.longitude;
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, { headers: { 'Accept-Language': 'ja' } });
+                const resData = await response.json(); 
+                let addr = "";
+                if (resData.address) {
+                    const a = resData.address;
+                    addr = (a.province || "") + (a.city || a.town || a.village || "") + (a.suburb || a.city_district || "") + (a.neighbourhood || "") + (a.road || "") + (a.house_number || "");
+                } else { addr = `${lat.toFixed(4)},${lng.toFixed(4)}`; }
+                data[`q${n}`] = `現在地(${addr})`; 
+                btn.innerText = "完了！"; 
+                setTimeout(next, ACTION_DELAY + 200);
+            } catch (e) { 
+                data[`q${n}`] = `現在地(${lat.toFixed(4)},${lng.toFixed(4)})`; 
+                btn.innerText = "座標で完了"; 
+                setTimeout(next, ACTION_DELAY + 200); 
+            }
+        }
+    }
 
-    function openMap(n) { window.open("https://www.google.com/maps", "_blank"); }
+    function openMap(n) { window.open("https://www.google.com/maps", "_blank"); }
 
-    function finish() {
-        const text = `【注文票】\n■構成：${data.q1}\n■目的：${data.q2.join('・')}\n■場所：${data.q3}\n■時間：${data.q4}\n■予算：${data.q5}\n■移動：${data.q6}\n■テーマ：${data.q7}\n■こだわり：${data.q8}\n■NG条件：${data.q9}`;
-        navigator.clipboard.writeText(text).then(() => {
-            const btn = document.getElementById('btn-finish');
-            btn.innerText = "よみこみちゅう・・・"; btn.classList.add('success');
-            setTimeout(() => { window.location.href = "https://gemini.google.com/"; }, ACTION_DELAY + 500);
-        });
-    }
-    initSlots();
+    function finish() {
+        const text = `【注文票】\n■構成：${data.q1}\n■目的：${data.q2.join('・')}\n■場所：${data.q3}\n■時間：${data.q4}\n■予算：${data.q5}\n■移動：${data.q6}\n■テーマ：${data.q7}\n■こだわり：${data.q8}\n■NG条件：${data.q9}`;
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = document.getElementById('btn-finish');
+            btn.innerText = "よみこみちゅう・・・"; btn.classList.add('success');
+            setTimeout(() => { window.location.href = "https://gemini.google.com/"; }, ACTION_DELAY + 500);
+        });
+    }
+    initSlots();
 </script>
 </body>
 </html>
