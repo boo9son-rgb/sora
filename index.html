@@ -18,22 +18,23 @@
             --shadow: 0 8px 30px rgba(0,0,0,0.12);
         }
 
-        /* 修正箇所：htmlとbodyのサイズを厳密に「今の画面サイズ(dvh)」に固定し、はみ出しを一切禁止する */
+        /* 修正箇所：html/bodyの基準を「画面の底辺」に完全に固定する */
         html {
             height: 100%;
             overflow: hidden;
-            background-color: var(--sky-blue); /* htmlそのものに色を塗る */
+            background-color: var(--sky-blue);
         }
 
         body { 
             margin: 0; padding: 0; 
-            height: 100dvh; /* 動的な高さに追従 */
+            height: 100vh; /* 固定の高さ */
+            height: -webkit-fill-available; /* Safari用の全画面補完 */
             width: 100vw;
             font-family: 'DotGothic16', sans-serif; 
             color: var(--text-dark); 
             overflow: hidden; 
-            position: fixed; /* 画面に張り付かせる */
-            top: 0; left: 0;
+            position: fixed; 
+            top: 0; left: 0; bottom: 0; right: 0; /* 四隅を完全に接着 */
             overscroll-behavior: none;
             background-size: cover;
             background-position: center center;
@@ -51,13 +52,10 @@
             user-select: text !important; 
         }
 
-        /* 背景レイヤー：画面下部に1pxの隙間も作らない設定 */
+        /* 背景レイヤー：最下部まで確実に色を届かせる */
         .sky-bg { 
             position: absolute; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
+            top: 0; left: 0; right: 0; bottom: 0; /* 1pxの隙間も許さない */
             z-index: -2; 
             background-color: transparent;
             background-size: cover;
