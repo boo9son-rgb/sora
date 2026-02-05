@@ -23,6 +23,7 @@
             touch-action: pan-x pan-y;
         }
 
+        /* 修正箇所：htmlとbody自体に背景設定を移譲し、隙間を根絶 */
         body, html { 
             margin: 0; padding: 0; 
             height: 100%; width: 100%;
@@ -33,6 +34,9 @@
             position: fixed;
             overscroll-behavior: none;
             background-color: var(--sky-blue);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
         }
 
         input, textarea { 
@@ -40,17 +44,16 @@
             user-select: text !important; 
         }
 
-        /* 修正箇所：基準をbottom:0にし、余白が下に出ないように固定 */
         .sky-bg { 
             position: fixed; 
-            bottom: 0; /* 下端を基準にする */
+            top: 0; 
             left: 0; 
             width: 100%; 
-            height: 110vh; /* 少し長めに確保して隙間を物理的に防ぐ */
+            height: 100%; 
             z-index: -2; 
             background-color: transparent;
             background-size: cover;
-            background-position: bottom center; /* 画像も下基準で配置 */
+            background-position: center;
             background-repeat: no-repeat;
         }
 
@@ -335,6 +338,7 @@
         if (p.style.display === 'block') p.style.display = 'none';
     }
 
+    /* 修正箇所：applyBG関数で、常にhtml/body側も同期させるよう変更 */
     function applyBG(val) { 
         if(!val) return; 
         currentBGValue = val;
@@ -342,15 +346,19 @@
         if (val === 'default') { 
             document.body.style.backgroundColor = '#a3c1da';
             document.documentElement.style.backgroundColor = '#a3c1da';
+            document.body.style.backgroundImage = 'none';
             bg.style.backgroundImage = 'none'; 
             currentBGValue = '#a3c1da';
         } else if (val.startsWith('data:image')) { 
-            bg.style.backgroundImage = `url(${val})`; 
+            const url = `url(${val})`;
+            bg.style.backgroundImage = url; 
+            document.body.style.backgroundImage = url; // 予備としてbodyにも設定
             document.body.style.backgroundColor = 'transparent';
             document.documentElement.style.backgroundColor = 'transparent';
         } else { 
             document.body.style.backgroundColor = val;
             document.documentElement.style.backgroundColor = val;
+            document.body.style.backgroundImage = 'none';
             bg.style.backgroundImage = 'none'; 
         } 
         localStorage.setItem('sora_bg_v7_solid', val); 
