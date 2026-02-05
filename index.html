@@ -18,23 +18,27 @@
             --shadow: 0 8px 30px rgba(0,0,0,0.12);
         }
 
-        /* 修正箇所：html/bodyを画面よりわずかに大きく設定し、はみ出しで隙間を殺す */
-        html, body { 
+        /* 修正箇所：htmlとbodyのサイズを厳密に「今の画面サイズ(dvh)」に固定し、はみ出しを一切禁止する */
+        html {
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--sky-blue); /* htmlそのものに色を塗る */
+        }
+
+        body { 
             margin: 0; padding: 0; 
-            height: 100.5%; width: 100%; /* 0.5%だけ大きく */
-            min-height: 101vh; /* 確実に画面下まで届かせる */
+            height: 100dvh; /* 動的な高さに追従 */
+            width: 100vw;
             font-family: 'DotGothic16', sans-serif; 
             color: var(--text-dark); 
             overflow: hidden; 
-            position: fixed;
-            top: -2px; /* 上に少しずらして下をカバー */
-            left: 0;
+            position: fixed; /* 画面に張り付かせる */
+            top: 0; left: 0;
             overscroll-behavior: none;
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            background-color: var(--sky-blue);
         }
 
         * { 
@@ -47,14 +51,13 @@
             user-select: text !important; 
         }
 
-        /* 背景レイヤーも上下に少し大きくしてズレを吸収 */
+        /* 背景レイヤー：画面下部に1pxの隙間も作らない設定 */
         .sky-bg { 
-            position: fixed; 
-            top: -10px; 
-            bottom: -10px;
+            position: absolute; 
+            top: 0; 
             left: 0; 
             width: 100%; 
-            height: calc(100% + 20px); 
+            height: 100%; 
             z-index: -2; 
             background-color: transparent;
             background-size: cover;
@@ -119,9 +122,8 @@
             opacity: 0; cursor: pointer;
         }
 
-        /* メインコンテンツは100%のままに維持 */
-        .viewport { display: flex; height: 100dvh; width: 100%; transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1); position: relative; top: 2px; }
-        .card { min-width: 100%; height: 100dvh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; }
+        .viewport { display: flex; height: 100%; transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1); }
+        .card { min-width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; }
         
         .window { 
             background: var(--cloud-white); backdrop-filter: blur(12px); 
