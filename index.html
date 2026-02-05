@@ -18,27 +18,21 @@
             --shadow: 0 8px 30px rgba(0,0,0,0.12);
         }
 
-        /* 修正箇所：html自体に背景色を塗り、余白を「色」で埋める（画像には影響させない） */
-        html {
+        /* 修正箇所：html/bodyの背景設定をシンプルに統一 */
+        html, body {
             height: 100%;
-            overflow: hidden;
-            background-color: var(--sky-blue); /* ここで下の隙間を同じ色で埋める */
-            position: fixed;
             width: 100%;
+            margin: 0; padding: 0;
+            overflow: hidden;
+            position: fixed;
             top: 0; left: 0;
+            overscroll-behavior: none;
+            background-color: var(--sky-blue); /* デフォルト色 */
         }
 
         body { 
-            margin: 0; padding: 0; 
-            height: 100dvh; 
-            width: 100vw;
             font-family: 'DotGothic16', sans-serif; 
             color: var(--text-dark); 
-            overflow: hidden; 
-            position: fixed; 
-            top: 0; left: 0;
-            overscroll-behavior: none;
-            background-color: transparent; /* bodyは透明にしてhtmlの色を見せる */
         }
 
         * { 
@@ -51,18 +45,18 @@
             user-select: text !important; 
         }
 
-        /* 背景レイヤー：サイズを100%（ズームなし）に戻し、位置を「上端固定」にする */
+        /* 背景レイヤー：色でも画像でも「画面全体を覆う」設定に統一 */
         .sky-bg { 
-            position: absolute; 
+            position: fixed; /* absoluteからfixedに変更し、より強固に固定 */
             top: 0; 
             left: 0; 
             width: 100%; 
-            height: 100dvh; /* 画面ぴったりに修正（ズーム防止） */
+            height: 100%; 
             z-index: -2; 
-            background-color: transparent;
             background-size: cover;
-            background-position: top center; /* 上基準にすることで下が余っても画像が歪まない */
+            background-position: center;
             background-repeat: no-repeat;
+            transition: background-color 0.3s ease; /* 色変化を滑らかに */
         }
 
         #effect-canvas {
@@ -346,25 +340,22 @@
         if (p.style.display === 'block') p.style.display = 'none';
     }
 
+    /* 修正箇所：applyBGの処理を画像・色ともに「sky-bg」に集約 */
     function applyBG(val) { 
         if(!val) return; 
         currentBGValue = val;
         const bg = document.getElementById('sky-bg'); 
-        const html = document.documentElement;
 
         if (val === 'default') { 
             bg.style.backgroundImage = 'none';
-            bg.style.backgroundColor = 'transparent';
-            html.style.backgroundColor = '#a3c1da'; /* htmlの色で隙間を埋める */
+            bg.style.backgroundColor = 'var(--sky-blue)';
             currentBGValue = '#a3c1da';
         } else if (val.startsWith('data:image')) { 
             bg.style.backgroundImage = `url(${val})`;
-            bg.style.backgroundColor = 'transparent';
-            html.style.backgroundColor = 'black'; /* 画像時は黒で隙間を埋めるか、近似色にする */
+            bg.style.backgroundColor = 'black'; /* 画像の後ろを黒で埋める */
         } else { 
             bg.style.backgroundImage = 'none';
-            bg.style.backgroundColor = 'transparent';
-            html.style.backgroundColor = val; /* htmlの色で隙間を埋める */
+            bg.style.backgroundColor = val; 
         } 
         localStorage.setItem('sora_bg_v7_solid', val); 
     }
