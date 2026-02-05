@@ -16,11 +16,11 @@
             --accent-green: #67a38b;
             --text-dark: #4a5568;
             --shadow: 0 8px 30px rgba(0,0,0,0.12);
-            /* 透明度制御用の変数 */
-            --win-opacity: 0.9;
+            /* 透明度制御用の変数：初期値は不透明(1) */
+            --win-opacity: 1;
+            --btn-alpha: 1;
         }
 
-        /* 修正箇所：htmlの背景を動的に書き換えるため、初期設定のみ維持 */
         html {
             height: 100%;
             overflow: hidden;
@@ -126,10 +126,11 @@
         .viewport { display: flex; height: 100%; transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1); }
         .card { min-width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; }
         
+        /* 修正：背景をぼかさず、透明度のみ適用 */
         .window { 
-            /* 背景色の不透明度を動的に変更 */
             background: rgba(255, 255, 255, var(--win-opacity)); 
-            backdrop-filter: blur(12px); 
+            backdrop-filter: none; /* ぼかし除去 */
+            -webkit-backdrop-filter: none;
             border-radius: 20px; padding: 20px; width: 100%; max-width: 320px; 
             text-align: center; box-shadow: var(--shadow); border: 1px solid rgba(255, 255, 255, 0.6); 
             height: 360px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;
@@ -142,7 +143,6 @@
         .inventory-grid::-webkit-scrollbar { display: none; }
 
         .item-chip { 
-            /* ボタンの背景色の不透明度を動的に変更、ただし枠線と影は維持 */
             background: rgba(255, 255, 255, var(--win-opacity)); 
             border: 1px solid #ddd; border-radius: 10px; 
             padding: 4px 6px; font-size: 0.85rem; cursor: pointer; 
@@ -157,22 +157,35 @@
         .slot-item.active { color: var(--text-dark); font-weight: bold; font-size: 1.1rem; }
         .slot-overlay { position: absolute; top: 40px; left: 0; width: 100%; height: 40px; pointer-events: none; border-top: 1px solid rgba(0,0,0,0.1); border-bottom: 1px solid rgba(0,0,0,0.1); background: rgba(0, 0, 0, 0.03); }
 
-        .btn-main { width: 100%; margin-top: 10px; padding: 12px; background: var(--text-dark) ; color: white; border: none; border-radius: 10px; font-family: inherit; font-size: 0.9rem; box-shadow: 0 4px 0 #222; cursor: pointer; position: relative; transition: transform 0.05s; }
+        /* 修正：メインボタンの背景透明度をスライダーと連動、テキスト透明度も連動 */
+        .btn-main { 
+            width: 100%; margin-top: 10px; padding: 12px; 
+            background: rgba(74, 85, 104, var(--btn-alpha)); /* --text-darkの色値をrgba化 */
+            color: rgba(255, 255, 255, var(--btn-alpha)); 
+            border: none; border-radius: 10px; font-family: inherit; font-size: 0.9rem; 
+            box-shadow: 0 4px 0 rgba(34, 34, 34, var(--btn-alpha)); 
+            cursor: pointer; position: relative; transition: transform 0.05s; 
+        }
         .btn-main:active { transform: translateY(4px); box-shadow: 0 0 0 #222; }
 
         .free-input-wrapper { display: flex; gap: 8px; width: 100%; margin-top: 8px; }
         .free-input, textarea { width: 100%; border: 1px solid #ddd; border-radius: 10px; padding: 10px; font-family: inherit; box-sizing: border-box; font-size: 0.85rem; outline: none; background: rgba(255,255,255, var(--win-opacity)); }
         
+        /* 修正：丸ボタン（決定）の透明度連動 */
         .btn-dot-ok { 
-            width: 44px; height: 44px; background: var(--accent-green); color: white; 
+            width: 44px; height: 44px; 
+            background: rgba(103, 163, 139, var(--btn-alpha)); /* --accent-greenをrgba化 */
+            color: rgba(255, 255, 255, var(--btn-alpha)); 
             border: none; border-radius: 50%; font-family: inherit; 
-            box-shadow: 0 4px 0 #4a7a66; cursor: pointer; display: flex; 
+            box-shadow: 0 4px 0 rgba(74, 122, 102, var(--btn-alpha)); 
+            cursor: pointer; display: flex; 
             align-items: center; justify-content: center; flex-shrink: 0; transition: transform 0.05s;
         }
         .btn-dot-ok:active { transform: translateY(4px); box-shadow: 0 0 0 #4a7a66; }
         
         .pixel-check {
-            width: 16px; height: 16px; background-color: white;
+            width: 16px; height: 16px; 
+            background-color: rgba(255, 255, 255, var(--btn-alpha)); /* チェックマークも連動 */
             clip-path: polygon(0% 50%, 12.5% 50%, 12.5% 62.5%, 25% 62.5%, 25% 75%, 37.5% 75%, 37.5% 87.5%, 50% 87.5%, 50% 75%, 62.5% 75%, 62.5% 62.5%, 75% 62.5%, 75% 50%, 87.5% 50%, 87.5% 37.5%, 100% 37.5%, 100% 12.5%, 87.5% 12.5%, 87.5% 25%, 75% 25%, 75% 37.5%, 62.5% 37.5%, 62.5% 50%, 50% 50%, 50% 62.5%, 37.5% 62.5%, 37.5% 50%, 25% 50%, 25% 37.5%, 12.5% 37.5%, 12.5% 50%, 0% 50%);
         }
 
@@ -181,7 +194,6 @@
 
         .btn-main.success { background: var(--accent-green) !important; box-shadow: 0 4px 0 #4a7a66 !important; }
 
-        /* スライダーのスタイル */
         .opacity-slider-row {
             background: rgba(0,0,0,0.05); padding: 8px; border-radius: 10px; margin-bottom: 8px;
             font-size: 0.75rem; display: flex; flex-direction: column; gap: 5px;
@@ -198,7 +210,7 @@
 <div class="bg-settings">
     <div class="bg-panel" id="bg-panel">
         <div class="opacity-slider-row">
-            <div style="display:flex; justify-content:space-between"><span>まどの透明度</span><span id="opacity-val">0%</span></div>
+            <div style="display:flex; justify-content:space-between"><span>とうめいど</span><span id="opacity-val">0%</span></div>
             <input type="range" class="opacity-slider" id="opacity-range" min="0" max="100" value="0" oninput="changeWinOpacity(this.value)">
         </div>
 
@@ -363,7 +375,6 @@
         if (p.style.display === 'block') p.style.display = 'none';
     }
 
-    /* 修正箇所：画像でもパレットの色でも一貫した処理を行うように統合 */
     function applyBG(val) { 
         if(!val) return; 
         currentBGValue = val;
@@ -455,7 +466,6 @@
             updateSlotStyle(n);
         });
 
-        // 透明度の復元
         const savedOpacity = localStorage.getItem('sora_win_opacity') || 0;
         document.getElementById('opacity-range').value = savedOpacity;
         changeWinOpacity(savedOpacity);
@@ -554,10 +564,16 @@
         });
     }
 
-    // 透明度変更処理の追加
+    // 透明度変更処理の修正（ボカシを消し、ボタンのアルファ値も操作）
     function changeWinOpacity(val) {
-        const opacity = (100 - val) / 100 * 0.9; // 0%の時に0.9(元の状態)、100%で0
-        document.documentElement.style.setProperty('--win-opacity', opacity);
+        // 窓の背景透明度 (0%の時0.9, 100%で0)
+        const winOpacity = (1 - (val / 100)) * 0.9;
+        // ボタンの背景/文字透明度 (0%の時1, 100%で0)
+        const btnAlpha = (1 - (val / 100));
+        
+        document.documentElement.style.setProperty('--win-opacity', winOpacity);
+        document.documentElement.style.setProperty('--btn-alpha', btnAlpha);
+        
         document.getElementById('opacity-val').innerText = val + "%";
         localStorage.setItem('sora_win_opacity', val);
     }
