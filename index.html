@@ -18,21 +18,27 @@
             --shadow: 0 8px 30px rgba(0,0,0,0.12);
         }
 
-        /* 修正箇所：html/bodyの背景設定をシンプルに統一 */
-        html, body {
+        /* 修正箇所：htmlの背景を動的に書き換えるため、初期設定のみ維持 */
+        html {
             height: 100%;
-            width: 100%;
-            margin: 0; padding: 0;
             overflow: hidden;
+            background-color: var(--sky-blue);
             position: fixed;
+            width: 100%;
             top: 0; left: 0;
-            overscroll-behavior: none;
-            background-color: var(--sky-blue); /* デフォルト色 */
         }
 
         body { 
+            margin: 0; padding: 0; 
+            height: 100dvh; 
+            width: 100vw;
             font-family: 'DotGothic16', sans-serif; 
             color: var(--text-dark); 
+            overflow: hidden; 
+            position: fixed; 
+            top: 0; left: 0;
+            overscroll-behavior: none;
+            background-color: transparent;
         }
 
         * { 
@@ -45,18 +51,17 @@
             user-select: text !important; 
         }
 
-        /* 背景レイヤー：色でも画像でも「画面全体を覆う」設定に統一 */
         .sky-bg { 
-            position: fixed; /* absoluteからfixedに変更し、より強固に固定 */
+            position: absolute; 
             top: 0; 
             left: 0; 
             width: 100%; 
-            height: 100%; 
+            height: 100dvh;
             z-index: -2; 
+            background-color: transparent;
             background-size: cover;
-            background-position: center;
+            background-position: center center;
             background-repeat: no-repeat;
-            transition: background-color 0.3s ease; /* 色変化を滑らかに */
         }
 
         #effect-canvas {
@@ -340,22 +345,27 @@
         if (p.style.display === 'block') p.style.display = 'none';
     }
 
-    /* 修正箇所：applyBGの処理を画像・色ともに「sky-bg」に集約 */
+    /* 修正箇所：画像でもパレットの色でも一貫した処理を行うように統合 */
     function applyBG(val) { 
         if(!val) return; 
         currentBGValue = val;
         const bg = document.getElementById('sky-bg'); 
+        const html = document.documentElement;
 
         if (val === 'default') { 
             bg.style.backgroundImage = 'none';
-            bg.style.backgroundColor = 'var(--sky-blue)';
+            bg.style.backgroundColor = 'transparent';
+            html.style.backgroundColor = '#a3c1da';
             currentBGValue = '#a3c1da';
         } else if (val.startsWith('data:image')) { 
             bg.style.backgroundImage = `url(${val})`;
-            bg.style.backgroundColor = 'black'; /* 画像の後ろを黒で埋める */
+            bg.style.backgroundColor = 'transparent';
+            // 画像の時、htmlの背景色は黒か画像に馴染む色にする
+            html.style.backgroundColor = 'rgba(0,0,0,0.9)'; 
         } else { 
             bg.style.backgroundImage = 'none';
-            bg.style.backgroundColor = val; 
+            bg.style.backgroundColor = 'transparent';
+            html.style.backgroundColor = val; 
         } 
         localStorage.setItem('sora_bg_v7_solid', val); 
     }
@@ -394,7 +404,16 @@
         alert("ここに上書き保存したよ！");
     }
 
-    function uploadBG(input) { if (input.files?.[0]) { const reader = new FileReader(); reader.onload = (e) => applyBG(e.target.result); reader.readAsDataURL(input.files[0]); } }
+    /* 修正箇所：アップロード後、applyBG関数を呼んで全体（html背景含む）を更新 */
+    function uploadBG(input) { 
+        if (input.files?.[0]) { 
+            const reader = new FileReader(); 
+            reader.onload = (e) => {
+                applyBG(e.target.result); 
+            };
+            reader.readAsDataURL(input.files[0]); 
+        } 
+    }
     
     function initSlots() { 
         ['p1', 'p2', 'p3'].forEach(id => { 
