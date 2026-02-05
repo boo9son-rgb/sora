@@ -40,17 +40,17 @@
             user-select: text !important; 
         }
 
-        /* 修正箇所：背景画像が下部まで確実に埋まるように調整 */
+        /* 修正箇所：基準をbottom:0にし、余白が下に出ないように固定 */
         .sky-bg { 
             position: fixed; 
-            top: 0; 
+            bottom: 0; /* 下端を基準にする */
             left: 0; 
             width: 100%; 
-            height: 100dvh; /* dvhを使用して操作バーを含めた全画面に対応 */
+            height: 110vh; /* 少し長めに確保して隙間を物理的に防ぐ */
             z-index: -2; 
             background-color: transparent;
             background-size: cover;
-            background-position: center;
+            background-position: bottom center; /* 画像も下基準で配置 */
             background-repeat: no-repeat;
         }
 
@@ -345,7 +345,6 @@
             bg.style.backgroundImage = 'none'; 
             currentBGValue = '#a3c1da';
         } else if (val.startsWith('data:image')) { 
-            // 修正箇所：画像適用時に背景レイヤーを全画面固定し、body色も透明化
             bg.style.backgroundImage = `url(${val})`; 
             document.body.style.backgroundColor = 'transparent';
             document.documentElement.style.backgroundColor = 'transparent';
