@@ -166,10 +166,10 @@ box-shadow: 0 4px 0 #ccc; display: flex; align-items: center; justify-content: c
 .slot-reel { transition: transform 0.3s ease-out; }
 .slot-item { height: 40px; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; color: #888; }
 /* 修正点：スロットの選択中文字に袋文字を追加 */
-.slot-item.active { 
-color: var(--text-dark); 
-font-weight: bold; 
-font-size: 1.1rem; 
+.slot-item.active {
+color: var(--text-dark);
+font-weight: bold;
+font-size: 1.1rem;
 text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 0px 1px 0 #fff, 0px -1px 0 #fff, 1px 0px 0 #fff, -1px 0px 0 #fff;
 }
 .slot-overlay { position: absolute; top: 40px; left: 0; width: 100%; height: 40px; pointer-events: none; border-top: 1px solid rgba(0,0,0,0.1);
@@ -188,9 +188,9 @@ border: 1px solid rgba(74, 85, 104, 0.2);
 
 .free-input-wrapper { display: flex; gap: 8px; width: 100%; margin-top: 8px; }
 /* 修正点：自由記述欄（input/textarea）の文字に袋文字を追加 */
-.free-input, textarea { 
+.free-input, textarea {
 width: 100%; border: 1px solid #ddd; border-radius: 10px; padding: 10px; font-family: inherit; box-sizing: border-box; font-size: 0.85rem;
-outline: none; background: rgba(255,255,255, var(--win-opacity)); 
+outline: none; background: rgba(255,255,255, var(--win-opacity));
 text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 0px 1px 0 #fff, 0px -1px 0 #fff, 1px 0px 0 #fff, -1px 0px 0 #fff;
 }
 
@@ -215,8 +215,8 @@ clip-path: polygon(0% 50%, 12.5% 50%, 12.5% 62.5%, 25% 62.5%, 25% 75%, 37.5% 75%
 
 textarea { height: 80px; resize: none; margin-top: 8px; }
 /* 修正点：最終確認画面のテキストに袋文字を追加 */
-#summary { 
-font-size:0.8rem; text-align:left; background:rgba(0,0,0,0.05); padding:12px; border-radius:10px; overflow-y:auto; flex:1; margin-bottom:5px; line-height:1.5; 
+#summary {
+font-size:0.8rem; text-align:left; background:rgba(0,0,0,0.05); padding:12px; border-radius:10px; overflow-y:auto; flex:1; margin-bottom:5px; line-height:1.5;
 text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 0px 1px 0 #fff, 0px -1px 0 #fff, 1px 0px 0 #fff, -1px 0px 0 #fff;
 }
 
@@ -346,7 +346,7 @@ particles.push({
 x: Math.random() * canvas.width,
 y: Math.random() * (canvas.height * 0.35),
 s: Math.random() * 0.3 + 0.15,
-w: Math.random() * 80 + 70
+w: Math.random() * 60 + 50 // ベース幅を少し調整
 });
 }
 }
@@ -368,26 +368,40 @@ if (p.y > canvas.height) { p.y = -p.l; p.x = Math.random() * canvas.width; }
 });
 } else {
 particles.forEach(p => {
+// 修正：より「もくもく」したドット雲の描画
 const drawPixelCloud = (x, y, baseW) => {
-const h = baseW * 0.6;
-const blocks = [
-{ dx: 0, dy: 0, bw: 1.0, bh: 0.4 },
-{ dx: 0.1, dy: -0.2, bw: 0.8, bh: 0.6 },
-{ dx: 0.25, dy: -0.4, bw: 0.5, bh: 0.8 },
-{ dx: 0.15, dy: 0.15, bw: 0.7, bh: 0.35 },
-{ dx: 0.05, dy: 0.05, bw: 0.3, bh: 0.3 }
+const r = baseW * 0.4;
+// 雲を構成するもくもくパーツ（中心、左右、上下）
+const circles = [
+{ dx: 0, dy: 0, rad: r * 1.0 },
+{ dx: -r * 0.6, dy: r * 0.2, rad: r * 0.7 },
+{ dx: r * 0.7, dy: r * 0.1, rad: r * 0.65 },
+{ dx: r * 0.1, dy: -r * 0.4, rad: r * 0.6 },
+{ dx: -r * 0.2, dy: r * 0.4, rad: r * 0.5 }
 ];
-ctx.fillStyle = 'rgba(0,0,0,0.2)';
-blocks.forEach(b => { ctx.fillRect(x + b.dx * baseW + 3, y + b.dy * h + 3, b.bw * baseW, b.bh * h); });
-ctx.fillStyle = 'white';
-blocks.forEach(b => { ctx.fillRect(x + b.dx * baseW, y + b.dy * h, b.bw * baseW, b.bh * h); });
+
+// 影の描画
+ctx.fillStyle = 'rgba(0,0,0,0.15)';
+circles.forEach(c => {
+ctx.beginPath();
+ctx.arc(x + c.dx + 4, y + c.dy + 4, c.rad, 0, Math.PI * 2);
+ctx.fill();
+});
+
+// 本体の描画
+ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+circles.forEach(c => {
+ctx.beginPath();
+ctx.arc(x + c.dx, y + c.dy, c.rad, 0, Math.PI * 2);
+ctx.fill();
+});
 };
 drawPixelCloud(p.x, p.y, p.w);
 p.x += p.s;
-if (p.x > canvas.width) {
-p.x = -p.w * 1.5;
+if (p.x > canvas.width + 100) {
+p.x = -p.w * 2;
 p.y = Math.random() * (canvas.height * 0.35);
-p.w = Math.random() * 80 + 70;
+p.w = Math.random() * 60 + 50;
 }
 });
 }
