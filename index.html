@@ -143,7 +143,7 @@ border-radius: 20px; padding: 20px; width: 100%; max-width: 320px;
 text-align: center; box-shadow: var(--shadow); border: 1px solid rgba(255, 255, 255, 0.6);
 height: 360px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;
 margin-top: env(safe-area-inset-top);
-/* 文字に袋文字効果を追加 */
+/* 修正点：中央ウィンドウの文字全体に袋文字効果を追加 */
 text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 0px 1px 0 #fff, 0px -1px 0 #fff, 1px 0px 0 #fff, -1px 0px 0 #fff;
 }
 
@@ -165,7 +165,13 @@ box-shadow: 0 4px 0 #ccc; display: flex; align-items: center; justify-content: c
 .slot-container { position: relative; height: 120px; overflow: hidden; margin: 5px 0; background: rgba(0,0,0,0.05); border-radius: 12px; touch-action: none; text-shadow: none; }
 .slot-reel { transition: transform 0.3s ease-out; }
 .slot-item { height: 40px; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; color: #888; }
-.slot-item.active { color: var(--text-dark); font-weight: bold; font-size: 1.1rem; }
+/* 修正点：スロットの選択中文字に袋文字を追加 */
+.slot-item.active { 
+color: var(--text-dark); 
+font-weight: bold; 
+font-size: 1.1rem; 
+text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 0px 1px 0 #fff, 0px -1px 0 #fff, 1px 0px 0 #fff, -1px 0px 0 #fff;
+}
 .slot-overlay { position: absolute; top: 40px; left: 0; width: 100%; height: 40px; pointer-events: none; border-top: 1px solid rgba(0,0,0,0.1);
 border-bottom: 1px solid rgba(0,0,0,0.1); background: rgba(0, 0, 0, 0.03); }
 
@@ -181,8 +187,12 @@ border: 1px solid rgba(74, 85, 104, 0.2);
 }
 
 .free-input-wrapper { display: flex; gap: 8px; width: 100%; margin-top: 8px; }
-.free-input, textarea { width: 100%; border: 1px solid #ddd; border-radius: 10px; padding: 10px; font-family: inherit; box-sizing: border-box; font-size: 0.85rem;
-outline: none; background: rgba(255,255,255, var(--win-opacity)); text-shadow: none; }
+/* 修正点：自由記述欄（input/textarea）の文字に袋文字を追加 */
+.free-input, textarea { 
+width: 100%; border: 1px solid #ddd; border-radius: 10px; padding: 10px; font-family: inherit; box-sizing: border-box; font-size: 0.85rem;
+outline: none; background: rgba(255,255,255, var(--win-opacity)); 
+text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 0px 1px 0 #fff, 0px -1px 0 #fff, 1px 0px 0 #fff, -1px 0px 0 #fff;
+}
 
 .btn-dot-ok {
 width: 44px; height: 44px; background: rgba(103, 163, 139, 1); color: white;
@@ -204,7 +214,11 @@ clip-path: polygon(0% 50%, 12.5% 50%, 12.5% 62.5%, 25% 62.5%, 25% 75%, 37.5% 75%
 }
 
 textarea { height: 80px; resize: none; margin-top: 8px; }
-#summary { font-size:0.8rem; text-align:left; background:rgba(0,0,0,0.05); padding:12px; border-radius:10px; overflow-y:auto; flex:1; margin-bottom:5px; line-height:1.5; text-shadow: none; }
+/* 修正点：最終確認画面のテキストに袋文字を追加 */
+#summary { 
+font-size:0.8rem; text-align:left; background:rgba(0,0,0,0.05); padding:12px; border-radius:10px; overflow-y:auto; flex:1; margin-bottom:5px; line-height:1.5; 
+text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 0px 1px 0 #fff, 0px -1px 0 #fff, 1px 0px 0 #fff, -1px 0px 0 #fff;
+}
 
 .btn-main.success { background: var(--accent-green) !important; box-shadow: 0 4px 0 #4a7a66 !important; }
 
@@ -261,7 +275,7 @@ font-size: 0.75rem; display: flex; flex-direction: column; gap: 5px;
 <div class="viewport" id="viewport">
 <div class="card"><div class="window"><h2>だれと あそぶ？</h2><div class="inventory-grid"><div class="item-chip" onpointerup="quickSave(1, 'ひとり')">ひとり</div><div class="item-chip" onpointerup="quickSave(1, '彼女と2人')">彼女</div><div class="item-chip" onpointerup="quickSave(1, '友達(2-4人)')">友達</div> <div class="item-chip" onpointerup="quickSave(1, '友達(大人数)')">友達(大人数)</div><div class="item-chip" onpointerup="quickSave(1, '会社')">会社</div><div class="item-chip" onpointerup="quickSave(1, '家族')">家族</div></div><div class="free-input-wrapper"><input type="text" id="q1_free" class="free-input" placeholder="そのほか..." onkeydown="if(event.key==='Enter') save(1, this.value)"><button class="btn-dot-ok" onpointerup="save(1, document.getElementById('q1_free').value)"><div class="pixel-check"></div></button></div></div></div>
 <div class="card"><div class="window"><h2>なにを したい？</h2><div class="inventory-grid" id="q2_grid"><div class="item-chip" onpointerup="toggleItem(this, 'モーニング')">モーニング</div><div class="item-chip" onpointerup="toggleItem(this, 'ランチ')">ランチ</div><div class="item-chip" onpointerup="toggleItem(this, 'カフェ')">カフェ</div><div class="item-chip" onpointerup="toggleItem(this, 'ディナー')">ディナー</div><div class="item-chip" onpointerup="toggleItem(this, 'バータイム')">バータイム</div><div class="item-chip" onpointerup="toggleItem(this, '深夜')">深夜</div><div class="item-chip" onpointerup="toggleItem(this, 'パン')">パン</div><div class="item-chip" onpointerup="toggleItem(this, 'スイーツ')">スイーツ</div><div class="item-chip" onpointerup="toggleItem(this, '遊び')">遊び</div><div class="item-chip" onpointerup="toggleItem(this, 'のんびり')">のんびり</div></div><input type="text" id="q2_free" class="free-input" placeholder="そのほか入力..."><button class="btn-main" onpointerup="nextMulti()">これでいく！</button></div></div>
-<div class="card"><div class="window"><h2>どこへ むかう？</h2><div class="inventory-grid"><div class="item-chip" id="gps-btn" onpointerup="getPreciseLocation(3)">現在地</div><div class="item-chip" onpointerup="quickSave(3, '本通周辺')">本通周辺</div><div class="item-chip" onpointerup="quickSave(3, '広島駅')')">広島駅</div><div class="item-chip" style="background: rgba(103, 163, 139, 0.1); border: 1px dashed var(--accent-green);"
+<div class="card"><div class="window"><h2>どこへ むかう？</h2><div class="inventory-grid"><div class="item-chip" id="gps-btn" onpointerup="getPreciseLocation(3)">現在地</div><div class="item-chip" onpointerup="quickSave(3, '本通周辺')">本通周辺</div><div class="item-chip" onpointerup="quickSave(3, '広島駅')">広島駅</div><div class="item-chip" style="background: rgba(103, 163, 139, 0.1); border: 1px dashed var(--accent-green);"
 onpointerup="openMap(3)">地図を開く</div></div><div class="free-input-wrapper"><input type="text" id="q3_free" class="free-input" placeholder="場所・住所..." onkeydown="if(event.key==='Enter') save(3, this.value)"><button class="btn-dot-ok" onpointerup="save(3, document.getElementById('q3_free').value)"><div class="pixel-check"></div></button></div></div></div>
 <div class="card"><div class="window"><h2>いつ いく？</h2><div class="slot-container" id="slot4"><div class="slot-reel"></div><div class="slot-overlay"></div></div><div class="free-input-wrapper"><input type="text" id="q4_free" class="free-input" placeholder="自由指定..." onkeydown="if(event.key==='Enter') saveSlot(4)"><button class="btn-dot-ok" onpointerup="saveSlot(4)"><div class="pixel-check"></div></button></div></div></div>
 <div class="card"><div class="window"><h2>よさんは？</h2><div class="slot-container" id="slot5"><div class="slot-reel"></div><div class="slot-overlay"></div></div><button class="btn-main" onpointerup="saveSlot(5)">この予算で！</button></div></div>
