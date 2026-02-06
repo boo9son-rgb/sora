@@ -368,20 +368,20 @@ if (p.y > canvas.height) { p.y = -p.l; p.x = Math.random() * canvas.width; }
 });
 } else {
 particles.forEach(p => {
-// 修正：より「もくもく」したドット雲の描画
+// 修正：ボリューミーで「下部が平たくない」もくもくドット雲の描画
 const drawPixelCloud = (x, y, baseW) => {
 const r = baseW * 0.4;
-// 雲を構成するもくもくパーツ（中心、左右、上下）
+// 雲を構成するパーツ配置（中心、左右、上、下に追加パーツを配置）
 const circles = [
-{ dx: 0, dy: 0, rad: r * 1.0 },
-{ dx: -r * 0.6, dy: r * 0.2, rad: r * 0.7 },
-{ dx: r * 0.7, dy: r * 0.1, rad: r * 0.65 },
-{ dx: r * 0.1, dy: -r * 0.4, rad: r * 0.6 },
-{ dx: -r * 0.2, dy: r * 0.4, rad: r * 0.5 }
+{ dx: 0, dy: 0, rad: r * 1.0 }, // 中心
+{ dx: -r * 0.7, dy: r * 0.1, rad: r * 0.75 }, // 左
+{ dx: r * 0.7, dy: r * 0.1, rad: r * 0.7 }, // 右
+{ dx: r * 0.1, dy: -r * 0.5, rad: r * 0.65 }, // 上
+{ dx: -r * 0.1, dy: r * 0.45, rad: r * 0.55 } // 下（平たさを解消）
 ];
 
 // 影の描画
-ctx.fillStyle = 'rgba(0,0,0,0.15)';
+ctx.fillStyle = 'rgba(0,0,0,0.12)';
 circles.forEach(c => {
 ctx.beginPath();
 ctx.arc(x + c.dx + 4, y + c.dy + 4, c.rad, 0, Math.PI * 2);
@@ -389,7 +389,7 @@ ctx.fill();
 });
 
 // 本体の描画
-ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
 circles.forEach(c => {
 ctx.beginPath();
 ctx.arc(x + c.dx, y + c.dy, c.rad, 0, Math.PI * 2);
