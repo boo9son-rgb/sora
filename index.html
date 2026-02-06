@@ -346,7 +346,7 @@ particles.push({
 x: Math.random() * canvas.width,
 y: Math.random() * (canvas.height * 0.35),
 s: Math.random() * 0.3 + 0.15,
-w: Math.random() * 60 + 50 // ベース幅を少し調整
+w: Math.random() * 80 + 40 // サイズをランダムに生成
 });
 }
 }
@@ -368,32 +368,31 @@ if (p.y > canvas.height) { p.y = -p.l; p.x = Math.random() * canvas.width; }
 });
 } else {
 particles.forEach(p => {
-// 修正：より「もくもく」したドット雲の描画
+// 修正：ドットの集合体で「もこもこ感」を表現したFF風の雲
 const drawPixelCloud = (x, y, baseW) => {
-const r = baseW * 0.4;
-// 雲を構成するもくもくパーツ（中心、左右、上下）
-const circles = [
-{ dx: 0, dy: 0, rad: r * 1.0 },
-{ dx: -r * 0.6, dy: r * 0.2, rad: r * 0.7 },
-{ dx: r * 0.7, dy: r * 0.1, rad: r * 0.65 },
-{ dx: r * 0.1, dy: -r * 0.4, rad: r * 0.6 },
-{ dx: -r * 0.2, dy: r * 0.4, rad: r * 0.5 }
+const size = Math.max(2, baseW / 12); // 1ブロックのサイズ
+
+// もこもこ感を出すためのドット配置レイアウト（1=本体, 2=立体感の影）
+const layout = [
+[0,0,0,1,1,1,0,0,0],
+[0,1,1,1,1,1,1,1,0],
+[1,1,1,1,1,1,1,1,1],
+[1,1,1,1,1,1,1,1,1],
+[0,2,2,2,2,2,2,2,0]
 ];
 
-// 影の描画
-ctx.fillStyle = 'rgba(0,0,0,0.15)';
-circles.forEach(c => {
-ctx.beginPath();
-ctx.arc(x + c.dx + 4, y + c.dy + 4, c.rad, 0, Math.PI * 2);
-ctx.fill();
-});
-
-// 本体の描画
+layout.forEach((row, i) => {
+row.forEach((cell, j) => {
+if (cell === 1) {
+// 雲本体
 ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-circles.forEach(c => {
-ctx.beginPath();
-ctx.arc(x + c.dx, y + c.dy, c.rad, 0, Math.PI * 2);
-ctx.fill();
+ctx.fillRect(x + j * size, y + i * size, size, size);
+} else if (cell === 2) {
+// 下部の影（もこもこの立体感）
+ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+ctx.fillRect(x + j * size, y + i * size, size, size);
+}
+});
 });
 };
 drawPixelCloud(p.x, p.y, p.w);
@@ -401,7 +400,7 @@ p.x += p.s;
 if (p.x > canvas.width + 100) {
 p.x = -p.w * 2;
 p.y = Math.random() * (canvas.height * 0.35);
-p.w = Math.random() * 60 + 50;
+p.w = Math.random() * 80 + 40; // 新しく生成される際もサイズをランダム化
 }
 });
 }
