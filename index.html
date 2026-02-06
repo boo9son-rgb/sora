@@ -346,8 +346,7 @@ particles.push({
 x: Math.random() * canvas.width,
 y: Math.random() * (canvas.height * 0.35),
 s: Math.random() * 0.3 + 0.15,
-w: Math.random() * 40 + 60,
-variation: Math.random() * 0.2 + 0.9 // パーツ半径のランダム倍率（0.9〜1.1）
+w: Math.random() * 60 + 50 // ベース幅を少し調整
 });
 }
 }
@@ -369,10 +368,10 @@ if (p.y > canvas.height) { p.y = -p.l; p.x = Math.random() * canvas.width; }
 });
 } else {
 particles.forEach(p => {
-// 修正：下部の平たさを解消し、生成ごとに形が変わるドット雲
-const drawPixelCloud = (x, y, baseW, varFactor) => {
-const r = baseW * 0.4 * varFactor;
-// もくもくパーツ構成
+// 修正：より「もくもく」したドット雲の描画
+const drawPixelCloud = (x, y, baseW) => {
+const r = baseW * 0.4;
+// 雲を構成するもくもくパーツ（中心、左右、上下）
 const circles = [
 { dx: 0, dy: 0, rad: r * 1.0 },
 { dx: -r * 0.6, dy: r * 0.2, rad: r * 0.7 },
@@ -380,16 +379,10 @@ const circles = [
 { dx: r * 0.1, dy: -r * 0.4, rad: r * 0.6 },
 { dx: -r * 0.2, dy: r * 0.4, rad: r * 0.5 }
 ];
-// 下部の平らさを消すための「こぼれドット」
-const debris = [
-{ dx: -r * 0.4, dy: r * 0.7, rad: r * 0.2 },
-{ dx: r * 0.3, dy: r * 0.6, rad: r * 0.25 },
-{ dx: r * 0.1, dy: r * 0.8, rad: r * 0.15 }
-];
 
 // 影の描画
 ctx.fillStyle = 'rgba(0,0,0,0.15)';
-[...circles, ...debris].forEach(c => {
+circles.forEach(c => {
 ctx.beginPath();
 ctx.arc(x + c.dx + 4, y + c.dy + 4, c.rad, 0, Math.PI * 2);
 ctx.fill();
@@ -397,19 +390,18 @@ ctx.fill();
 
 // 本体の描画
 ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-[...circles, ...debris].forEach(c => {
+circles.forEach(c => {
 ctx.beginPath();
 ctx.arc(x + c.dx, y + c.dy, c.rad, 0, Math.PI * 2);
 ctx.fill();
 });
 };
-drawPixelCloud(p.x, p.y, p.w, p.variation);
+drawPixelCloud(p.x, p.y, p.w);
 p.x += p.s;
 if (p.x > canvas.width + 100) {
 p.x = -p.w * 2;
 p.y = Math.random() * (canvas.height * 0.35);
-p.w = Math.random() * 40 + 60;
-p.variation = Math.random() * 0.2 + 0.9; // 再登場時に形をリセット
+p.w = Math.random() * 60 + 50;
 }
 });
 }
@@ -643,3 +635,4 @@ initSlots();
 </script>
 </body>
 </html>
+
